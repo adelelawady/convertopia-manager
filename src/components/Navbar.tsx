@@ -5,9 +5,9 @@ const Navbar = () => {
   
   const links = [
     { path: "/", label: "Home" },
-    { path: "/pdf-to-word", label: "PDF to Word" },
-    { path: "/image-to-pdf", label: "Image to PDF" },
-    { path: "/word-to-pdf", label: "Word to PDF" },
+    { path: "/image-converter", label: "Image Converter" },
+    { path: "/audio-converter", label: "Audio Converter" },
+    { path: "/document-converter", label: "Document Converter" },
   ];
 
   return (

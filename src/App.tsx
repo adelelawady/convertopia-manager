@@ -6,13 +6,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Index from "./pages/Index";
-import PdfToWord from "./pages/PdfToWord";
-import ImageToPdf from "./pages/ImageToPdf";
-import WordToPdf from "./pages/WordToPdf";
-import PngToPdf from "./pages/image-converters/PngToPdf";
-import JpegToPdf from "./pages/image-converters/JpegToPdf";
-import DocToPdf from "./pages/word-converters/DocToPdf";
-import DocxToPdf from "./pages/word-converters/DocxToPdf";
+import ImageConverter from "./pages/ImageConverter";
+import AudioConverter from "./pages/AudioConverter";
+import DocumentConverter from "./pages/DocumentConverter";
 
 const queryClient = new QueryClient();
 
@@ -27,13 +23,9 @@ const App = () => (
           <main className="flex-1 bg-gray-50">
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/pdf-to-word" element={<PdfToWord />} />
-              <Route path="/image-to-pdf" element={<ImageToPdf />} />
-              <Route path="/word-to-pdf" element={<WordToPdf />} />
-              <Route path="/image-to-pdf/png" element={<PngToPdf />} />
-              <Route path="/image-to-pdf/jpeg" element={<JpegToPdf />} />
-              <Route path="/word-to-pdf/doc" element={<DocToPdf />} />
-              <Route path="/word-to-pdf/docx" element={<DocxToPdf />} />
+              <Route path="/image-converter" element={<ImageConverter />} />
+              <Route path="/audio-converter" element={<AudioConverter />} />
+              <Route path="/document-converter" element={<DocumentConverter />} />
             </Routes>
           </main>
           <Footer />
