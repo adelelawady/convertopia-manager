@@ -114,13 +114,16 @@ const FileUploader = ({
             >
               <div className="flex items-center space-x-4">
                 <File className="h-6 w-6 text-gray-400" />
-                <div className="flex-1">
-                  <div className="flex justify-between">
-                    <p className="text-sm font-medium text-gray-700">
+                <div className="flex-1 min-w-0">
+                  <div className="flex justify-between items-center">
+                    <p className="text-sm font-medium text-gray-700 truncate" title={file.name}>
                       {file.name}
                     </p>
+                    <span className="text-xs text-gray-500 ml-2">
+                      {(file.size / 1024 / 1024).toFixed(2)} MB
+                    </span>
                     {file.status === "completed" && (
-                      <CheckCircle2 className="h-5 w-5 text-green-500" />
+                      <CheckCircle2 className="h-5 w-5 text-green-500 ml-2 flex-shrink-0" />
                     )}
                   </div>
                   <Progress value={file.progress} className="mt-2" />
