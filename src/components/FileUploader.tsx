@@ -110,10 +110,10 @@ const FileUploader = ({
           {files.map((file, index) => (
             <div
               key={index}
-              className="bg-white rounded-lg p-4 shadow-sm border"
+              className="bg-white rounded-lg p-4 shadow-sm border border-gray-200"
             >
               <div className="flex items-center space-x-4">
-                <File className="h-6 w-6 text-gray-400" />
+                <File className="h-6 w-6 text-primary" />
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-center">
                     <p className="text-sm font-medium text-gray-700 truncate" title={file.name}>
@@ -123,7 +123,7 @@ const FileUploader = ({
                       {(file.size / 1024 / 1024).toFixed(2)} MB
                     </span>
                     {file.status === "completed" && (
-                      <CheckCircle2 className="h-5 w-5 text-green-500 ml-2 flex-shrink-0" />
+                      <CheckCircle2 className="h-5 w-5 text-accent ml-2 flex-shrink-0" />
                     )}
                   </div>
                   <Progress value={file.progress} className="mt-2" />
