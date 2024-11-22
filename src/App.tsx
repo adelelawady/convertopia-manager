@@ -12,7 +12,7 @@ import DocumentConverter from "./pages/DocumentConverter";
 
 // Image Converters
 import PngConverter from "./pages/image-converters/PngConverter";
-import JpgConverter from "./pages/image-converters/JpgConverter";
+import JpegConverter from "./pages/image-converters/JpegConverter";
 import WebpConverter from "./pages/image-converters/WebpConverter";
 import GifConverter from "./pages/image-converters/GifConverter";
 
@@ -54,7 +54,7 @@ const App = () => (
 
                 {/* Image converter sub-routes */}
                 <Route path="/image-converter/png" element={<PngConverter />} />
-                <Route path="/image-converter/jpg" element={<JpgConverter />} />
+                <Route path="/image-converter/jpeg" element={<JpegConverter />} />
                 <Route path="/image-converter/webp" element={<WebpConverter />} />
                 <Route path="/image-converter/gif" element={<GifConverter />} />
 

@@ -48,9 +48,9 @@ const converterCategories = [
         path: "/image-converter/png",
       },
       {
-        ext: "JPG",
-        description: "Convert JPG images",
-        path: "/image-converter/jpg",
+        ext: "JPEG",
+        description: "Convert JPEG images",
+        path: "/image-converter/jpeg",
       },
       {
         ext: "WEBP",

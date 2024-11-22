@@ -19,7 +19,14 @@ export const PyodideProvider = ({ children }: PyodideLoaderProps) => {
         });
 
         // Load required Python packages
-        await pyodide.loadPackage(['numpy', 'pillow','micropip']);
+        await pyodide.loadPackage(['numpy', 'pillow', 'micropip']);
+
+        // Initialize the Python environment with required functions
+        await pyodide.runPythonAsync(`
+          import micropip
+          await micropip.install("pillow")
+        `);
+        console.log('Pillow installed.');
 
         // Make pyodide instance globally available
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

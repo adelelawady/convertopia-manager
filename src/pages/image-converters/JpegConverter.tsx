@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import FileUploader from "@/components/FileUploader";
 import { toast } from "sonner";
+import { handleConversion } from "@/utils/conversionHandler";
 
 const outputFormats = [
   { value: "png", label: "PNG" },
@@ -12,7 +13,7 @@ const outputFormats = [
   { value: "pdf", label: "PDF" },
 ];
 
-const JpgConverter = () => {
+const JpegConverter = () => {
   const [selectedFormat, setSelectedFormat] = useState(outputFormats[0].value);
 
   const handleConvert = async (files: File[]) => {
@@ -71,4 +72,4 @@ const JpgConverter = () => {
   );
 };
 
-export default JpgConverter; 
+export default JpegConverter; 

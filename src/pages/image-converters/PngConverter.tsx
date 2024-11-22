@@ -8,7 +8,7 @@ import { usePyodide } from "@/hooks/usePyodide";
 import { toast } from "react-hot-toast";
 
 const outputFormats = [
-  { value: "jpg", label: "JPG" },
+  { value: "jpeg", label: "JPEG" },
   { value: "webp", label: "WebP" },
   { value: "gif", label: "GIF" },
   { value: "pdf", label: "PDF" },
