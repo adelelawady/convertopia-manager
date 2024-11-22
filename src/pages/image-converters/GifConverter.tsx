@@ -1,25 +1,17 @@
-import { useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { useState } from 'react';
+import { handleConversion } from '@/utils/conversionHandler';
+import { FileUploader } from '@/components/FileUploader';
+import { ArrowLeft } from 'lucide-react';
 import { Link } from "react-router-dom";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import FileUploader from "@/components/FileUploader";
-import { handleConversion } from "@/utils/conversionHandler";
-
-const outputFormats = [
-  { value: "png", label: "PNG" },
-  { value: "jpg", label: "JPG" },
-  { value: "webp", label: "WebP" },
-  { value: "pdf", label: "PDF" },
-];
 
 const GifConverter = () => {
-  const [selectedFormat, setSelectedFormat] = useState(outputFormats[0].value);
+  const [selectedFormat, setSelectedFormat] = useState('png');
 
   const handleConvert = async (files: File[]) => {
-    await handleConversion({
+    return await handleConversion({
       files,
-      outputFormat: selectedFormat.toUpperCase(),
-      inputFormat: "GIF"
+      outputFormat: selectedFormat,
+      inputFormat: 'GIF'
     });
   };
 
@@ -35,7 +27,7 @@ const GifConverter = () => {
       
       <h1 className="text-3xl font-bold text-gray-900 mb-4">GIF Converter</h1>
       <p className="text-gray-600 mb-8">
-        Convert your GIF images to other formats
+        Convert your GIF images to other formats while preserving quality
       </p>
 
       <div className="bg-white rounded-lg shadow p-6 space-y-6">
@@ -43,18 +35,15 @@ const GifConverter = () => {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Output Format
           </label>
-          <Select value={selectedFormat} onValueChange={setSelectedFormat}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select format" />
-            </SelectTrigger>
-            <SelectContent>
-              {outputFormats.map((format) => (
-                <SelectItem key={format.value} value={format.value}>
-                  {format.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <select 
+            value={selectedFormat}
+            onChange={(e) => setSelectedFormat(e.target.value)}
+            className="p-2 border rounded w-[180px]"
+          >
+            <option value="png">PNG</option>
+            <option value="jpeg">JPEG</option>
+            <option value="webp">WebP</option>
+          </select>
         </div>
 
         <div>
@@ -63,8 +52,22 @@ const GifConverter = () => {
           </label>
           <FileUploader
             acceptedFileTypes={[".gif"]}
+            maxFiles={10}
             onConvert={handleConvert}
+            outputFormat={selectedFormat}
           />
+        </div>
+
+        <div className="text-sm text-gray-500 mt-4">
+          <h3 className="font-medium text-gray-700 mb-2">About GIF Conversion</h3>
+          <ul className="list-disc pl-5 space-y-1">
+            <li>GIF to PNG: Best for preserving image quality and transparency</li>
+            <li>GIF to JPEG: Suitable for static images where transparency isn't needed</li>
+            <li>GIF to WebP: Modern format with good compression and quality</li>
+          </ul>
+          <p className="mt-2 text-yellow-600">
+            Note: Converting animated GIFs will only convert the first frame
+          </p>
         </div>
       </div>
     </div>

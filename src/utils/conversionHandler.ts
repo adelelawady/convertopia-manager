@@ -31,6 +31,7 @@ const handleImageConversion = async (files: File[], outputFormat: string): Promi
           .join('')
       );
 
+      console.log(outputFormat);
       // Convert image using Python with format-specific optimizations
       const result = await pyodide.runPythonAsync(`
         from io import BytesIO
@@ -44,8 +45,11 @@ const handleImageConversion = async (files: File[], outputFormat: string): Promi
         img_data = BytesIO(image_data)
         image = Image.open(img_data)
 
-        # Convert to RGB if necessary
-        if image.mode in ('RGBA', 'LA') or (image.mode == 'P' and 'transparency' in image.info):
+        # Always convert GIF and palette images to RGB before processing
+        if image.format == 'GIF' or image.mode == 'P':
+            image = image.convert('RGB')
+        # Convert other formats with transparency to RGB
+        elif image.mode in ('RGBA', 'LA'):
             image = image.convert('RGB')
 
         # Prepare output
@@ -76,7 +80,7 @@ const handleImageConversion = async (files: File[], outputFormat: string): Promi
                       lossless=False)
 
         elif output_format == "GIF":
-            # GIF optimization
+            # Convert to palette mode for GIF
             image = image.convert('P', palette=Image.Palette.ADAPTIVE, colors=256)
             image.save(output, 
                       format="GIF",
@@ -93,7 +97,6 @@ const handleImageConversion = async (files: File[], outputFormat: string): Promi
       const newFileName = `${file.name.split('.')[0]}.${outputFormat.toLowerCase()}`;
       const mimeTypes = {
         'jpeg': 'image/jpeg',
-        'jpg': 'image/jpeg',
         'png': 'image/png',
         'webp': 'image/webp',
         'gif': 'image/gif'
