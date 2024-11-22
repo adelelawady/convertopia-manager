@@ -6,7 +6,14 @@ interface ConversionRequest {
   inputFormat: string;
 }
 
-const handleImageConversion = async (files: File[], outputFormat: string) => {
+export interface ConvertedFile {
+  file: File;
+  url: string;
+  originalName: string;
+  outputFormat: string;
+}
+
+const handleImageConversion = async (files: File[], outputFormat: string): Promise<ConvertedFile[]> => {
   try {
     const results = await Promise.all(files.map(async (file) => {
       // Get pyodide instance
@@ -94,20 +101,16 @@ const handleImageConversion = async (files: File[], outputFormat: string) => {
         type: mimeTypes[outputFormat.toLowerCase()] || `image/${outputFormat.toLowerCase()}`
       });
 
-      return newFile;
-    }));
+      // Create object URL for the file
+      const url = URL.createObjectURL(newFile);
 
-    // Create download links for converted files
-    results.forEach(file => {
-      const url = URL.createObjectURL(file);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = file.name;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    });
+      return {
+        file: newFile,
+        url,
+        originalName: file.name,
+        outputFormat: outputFormat.toLowerCase()
+      };
+    }));
 
     toast.success(`Successfully converted ${files.length} files to ${outputFormat}`);
     return results;
@@ -118,16 +121,33 @@ const handleImageConversion = async (files: File[], outputFormat: string) => {
   }
 };
 
+// Helper function to download a converted file
+export const downloadConvertedFile = (convertedFile: ConvertedFile) => {
+  const a = document.createElement('a');
+  a.href = convertedFile.url;
+  a.download = convertedFile.file.name;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+};
+
+// Helper function to cleanup URLs when they're no longer needed
+export const cleanupConvertedFile = (convertedFile: ConvertedFile) => {
+  URL.revokeObjectURL(convertedFile.url);
+};
+
 export const handleConversion = async ({ files, outputFormat, inputFormat }: ConversionRequest) => {
   try {
     console.log(`Converting ${files.length} ${inputFormat} files to ${outputFormat}`);
+    
+    let convertedFiles: ConvertedFile[] = [];
     
     switch (inputFormat.toLowerCase()) {
       case 'png':
       case 'jpeg':
       case 'webp':
       case 'gif':
-        await handleImageConversion(files, outputFormat);
+        convertedFiles = await handleImageConversion(files, outputFormat);
         break;
       case 'pdf':
       case 'doc':
@@ -150,6 +170,7 @@ export const handleConversion = async ({ files, outputFormat, inputFormat }: Con
     return {
       success: true,
       message: `Converted ${files.length} files from ${inputFormat} to ${outputFormat}`,
+      convertedFiles
     };
   } catch (error) {
     console.error('Conversion error:', error);
@@ -157,6 +178,7 @@ export const handleConversion = async ({ files, outputFormat, inputFormat }: Con
     return {
       success: false,
       message: `Failed to convert files: ${error.message}`,
+      convertedFiles: []
     };
   }
 };
