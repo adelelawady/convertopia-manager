@@ -10,7 +10,6 @@ const handleImageConversion = async (files: File[], outputFormat: string) => {
   try {
     const results = await Promise.all(files.map(async (file) => {
       // Get pyodide instance
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const pyodide = (window as any).pyodide;
       if (!pyodide) {
         throw new Error('Python environment not initialized');
@@ -25,7 +24,7 @@ const handleImageConversion = async (files: File[], outputFormat: string) => {
           .join('')
       );
 
-      // Convert image using Python
+      // Convert image using Python with format-specific optimizations
       const result = await pyodide.runPythonAsync(`
         from io import BytesIO
         from PIL import Image, ImageEnhance
@@ -42,16 +41,42 @@ const handleImageConversion = async (files: File[], outputFormat: string) => {
         if image.mode in ('RGBA', 'LA') or (image.mode == 'P' and 'transparency' in image.info):
             image = image.convert('RGB')
 
-        # Enhance image quality
-        enhancer = ImageEnhance.Sharpness(image)
-        image = enhancer.enhance(1.2)  # Slight sharpening
-
-        enhancer = ImageEnhance.Contrast(image)
-        image = enhancer.enhance(1.1)  # Slight contrast enhancement
-
-        # Save to bytes with specified format
+        output_format = '${outputFormat.toLowerCase()}'
         output = BytesIO()
-        image.save(output, format='${outputFormat.toLowerCase()}', quality=95)
+
+        if output_format == 'jpeg':
+            # Optimize for JPEG
+            enhancer = ImageEnhance.Sharpness(image)
+            image = enhancer.enhance(1.2)
+            enhancer = ImageEnhance.Contrast(image)
+            image = enhancer.enhance(1.1)
+            image.save(output, 
+                      format='JPEG', 
+                      quality=95, 
+                      optimize=True)
+
+        elif output_format == 'webp':
+            # Optimize for WebP
+            image.save(output, 
+                      format='WEBP', 
+                      quality=90, 
+                      method=6,  # Highest compression method
+                      lossless=False)
+
+        elif output_format == 'gif':
+            # Optimize for GIF
+            # Convert to adaptive palette for better color representation
+            image = image.convert('P', palette=Image.Palette.ADAPTIVE, colors=256)
+            image.save(output, 
+                      format='GIF', 
+                      optimize=True)
+
+        else:
+            # Default save with basic optimization
+            image.save(output, 
+                      format=output_format.upper(), 
+                      quality=95 if output_format in ['jpeg', 'webp'] else None)
+
         output.getvalue()
       `);
 
@@ -60,8 +85,13 @@ const handleImageConversion = async (files: File[], outputFormat: string) => {
 
       // Create new file with converted data
       const newFileName = `${file.name.split('.')[0]}.${outputFormat.toLowerCase()}`;
+      const mimeTypes = {
+        'jpeg': 'image/jpeg',
+        'webp': 'image/webp',
+        'gif': 'image/gif'
+      };
       const newFile = new File([convertedData], newFileName, {
-        type: `image/${outputFormat.toLowerCase()}`
+        type: mimeTypes[outputFormat.toLowerCase()] || `image/${outputFormat.toLowerCase()}`
       });
 
       return newFile;

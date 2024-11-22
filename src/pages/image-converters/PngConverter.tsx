@@ -11,7 +11,6 @@ const outputFormats = [
   { value: "jpeg", label: "JPEG" },
   { value: "webp", label: "WebP" },
   { value: "gif", label: "GIF" },
-  { value: "pdf", label: "PDF" },
 ];
 
 const PngConverter = () => {

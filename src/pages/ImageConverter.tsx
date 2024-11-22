@@ -11,7 +11,7 @@ const supportedFormats = [
   {
     ext: "JPG",
     description: "Convert JPG/JPEG images to other formats",
-    path: "/image-converter/jpg",
+    path: "/image-converter/jpeg",
   },
   {
     ext: "WEBP",
