@@ -15,9 +15,13 @@ const outputFormats = [
 const JpgConverter = () => {
   const [selectedFormat, setSelectedFormat] = useState(outputFormats[0].value);
 
-  const handleConvert = (files: File[]) => {
-    toast.success(`Converting ${files.length} JPG files to ${selectedFormat.toUpperCase()}`);
-  };
+  const handleConvert = async (files: File[]) => {
+    await handleConversion({
+      files,
+      outputFormat: selectedFormat.toUpperCase(),
+      inputFormat: "JPG"
+    });
+  }
 
   return (
     <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">

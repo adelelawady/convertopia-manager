@@ -3,7 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import FileUploader from "@/components/FileUploader";
-import { toast } from "sonner";
+import { handleConversion } from "@/utils/conversionHandler";
 
 const outputFormats = [
   { value: "doc", label: "DOC" },
@@ -15,8 +15,12 @@ const outputFormats = [
 const PdfConverter = () => {
   const [selectedFormat, setSelectedFormat] = useState(outputFormats[0].value);
 
-  const handleConvert = (files: File[]) => {
-    toast.success(`Converting ${files.length} PDF files to ${selectedFormat.toUpperCase()}`);
+  const handleConvert = async (files: File[]) => {
+    await handleConversion({
+      files,
+      outputFormat: selectedFormat.toUpperCase(),
+      inputFormat: "PDF"
+    });
   };
 
   return (
@@ -31,7 +35,7 @@ const PdfConverter = () => {
       
       <h1 className="text-3xl font-bold text-gray-900 mb-4">PDF Converter</h1>
       <p className="text-gray-600 mb-8">
-        Convert your PDF documents to other formats
+        Convert your PDF files to other formats
       </p>
 
       <div className="bg-white rounded-lg shadow p-6 space-y-6">

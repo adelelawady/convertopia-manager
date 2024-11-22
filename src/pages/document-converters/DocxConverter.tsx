@@ -3,7 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import FileUploader from "@/components/FileUploader";
-import { toast } from "sonner";
+import { handleConversion } from "@/utils/conversionHandler";
 
 const outputFormats = [
   { value: "pdf", label: "PDF" },
@@ -15,8 +15,12 @@ const outputFormats = [
 const DocxConverter = () => {
   const [selectedFormat, setSelectedFormat] = useState(outputFormats[0].value);
 
-  const handleConvert = (files: File[]) => {
-    toast.success(`Converting ${files.length} DOCX files to ${selectedFormat.toUpperCase()}`);
+  const handleConvert = async (files: File[]) => {
+    await handleConversion({
+      files,
+      outputFormat: selectedFormat.toUpperCase(),
+      inputFormat: "DOCX"
+    });
   };
 
   return (

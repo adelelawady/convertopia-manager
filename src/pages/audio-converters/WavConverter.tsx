@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import FileUploader from "@/components/FileUploader";
 import { toast } from "sonner";
+import { handleConversion } from "@/utils/conversionHandler";
 
 const outputFormats = [
   { value: "mp3", label: "MP3" },
@@ -15,9 +16,13 @@ const outputFormats = [
 const WavConverter = () => {
   const [selectedFormat, setSelectedFormat] = useState(outputFormats[0].value);
 
-  const handleConvert = (files: File[]) => {
-    toast.success(`Converting ${files.length} WAV files to ${selectedFormat.toUpperCase()}`);
-  };
+  const handleConvert = async (files: File[]) => {
+    await handleConversion({
+      files,
+      outputFormat: selectedFormat.toUpperCase(),
+      inputFormat: "WAV"
+    });
+  }
 
   return (
     <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
