@@ -40,10 +40,12 @@ const WebpConverter = () => {
             onChange={(e) => setSelectedFormat(e.target.value)}
             className="p-2 border rounded w-[180px]"
           >
-            <option value="jpeg">JPEG</option>
-            <option value="png">PNG</option>
-            <option value="gif">GIF</option>
-            <option value="ico">ico</option>
+                     <option value="png">PNG</option>
+           
+           <option value="jpeg">Jpeg</option>
+           <option value="bmp">Bmp</option>
+           <option value="gif">Gif</option>
+           <option value="ico">Ico</option>
           </select>
         </div>
 

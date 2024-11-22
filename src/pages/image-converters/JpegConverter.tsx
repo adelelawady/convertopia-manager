@@ -40,10 +40,12 @@ const JpegConverter = () => {
             onChange={(e) => setSelectedFormat(e.target.value)}
             className="p-2 border rounded w-[180px]"
           >
-            <option value="png">PNG</option>
+                     <option value="png">PNG</option>
+           
             <option value="webp">WebP</option>
-            <option value="gif">GIF</option>
-            <option value="ico">ico</option>
+            <option value="bmp">Bmp</option>
+            <option value="gif">Gif</option>
+            <option value="ico">Ico</option>
           </select>
         </div>
 

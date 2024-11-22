@@ -43,7 +43,8 @@ const GifConverter = () => {
             <option value="png">PNG</option>
             <option value="jpeg">JPEG</option>
             <option value="webp">WebP</option>
-            <option value="ico">ico</option>
+            <option value="bmp">Bmp</option>
+            <option value="ico">Ico</option>
           </select>
         </div>
 

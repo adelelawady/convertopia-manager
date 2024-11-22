@@ -20,7 +20,7 @@ const ImageConverter = () => {
       description: "Convert JPEG images to PNG, WebP, or GIF formats",
       path: "/image-converter/jpeg",
       icon: "/icons/jpg-icon.svg",
-      formats: ["PNG", "WebP", "GIF"],
+      formats: ["PNG", "WebP", "GIF","Ico","Bmp"],
       features: [
         "Optimized compression",
         "Fast conversion",
@@ -32,7 +32,7 @@ const ImageConverter = () => {
       description: "Convert WebP images to PNG, JPEG, or GIF formats",
       path: "/image-converter/webp",
       icon: "/icons/webp-icon.svg",
-      formats: ["PNG", "JPEG", "GIF"],
+      formats: ["PNG", "JPEG", "GIF","Ico","Bmp"],
       features: [
         "Modern format",
         "Excellent compression",
@@ -44,7 +44,7 @@ const ImageConverter = () => {
       description: "Convert GIF images to PNG, JPEG, or WebP formats",
       path: "/image-converter/gif",
       icon: "/icons/gif-icon.svg",
-      formats: ["PNG", "JPEG", "WebP"],
+      formats: ["PNG", "JPEG", "WebP","ico","Bmp"],
       features: [
         "Animation support",
         "Frame extraction",
@@ -57,7 +57,7 @@ const ImageConverter = () => {
       description: "Convert Ico images to PNG, JPEG, or WebP formats",
       path: "/image-converter/ico",
       icon: "/icons/ico-icon.svg",
-      formats: ["PNG", "JPEG", "WebP","gif","bmp"],
+      formats: ["PNG", "JPEG", "WebP","gif","Bmp"],
       features: [
         "Animation support",
         "Frame extraction",

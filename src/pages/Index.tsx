@@ -3,39 +3,7 @@ import { Link } from "react-router-dom";
 import { FileText, Image, Music } from "lucide-react";
 
 const converterCategories = [
-  {
-    title: "Document Converter",
-    description: "Convert documents between different formats",
-    icon: FileText,
-    color: "bg-blue-500",
-    formats: [
-      {
-        ext: "PDF",
-        description: "Convert PDF documents",
-        path: "/document-converter/pdf",
-      },
-      {
-        ext: "DOC",
-        description: "Convert DOC documents",
-        path: "/document-converter/doc",
-      },
-      {
-        ext: "DOCX",
-        description: "Convert DOCX documents",
-        path: "/document-converter/docx",
-      },
-      {
-        ext: "TXT",
-        description: "Convert TXT documents",
-        path: "/document-converter/txt",
-      },
-      {
-        ext: "RTF",
-        description: "Convert RTF documents",
-        path: "/document-converter/rtf",
-      },
-    ],
-  },
+  
   {
     title: "Image Converter",
     description: "Convert images between different formats",
@@ -71,6 +39,39 @@ const converterCategories = [
         ext: "BMP",
         description: "Convert bmp images",
         path: "/image-converter/bmp",
+      },
+    ],
+  },
+  {
+    title: "Document Converter",
+    description: "Convert documents between different formats",
+    icon: FileText,
+    color: "bg-blue-500",
+    formats: [
+      {
+        ext: "PDF",
+        description: "Convert PDF documents",
+        path: "/document-converter/pdf",
+      },
+      {
+        ext: "DOC",
+        description: "Convert DOC documents",
+        path: "/document-converter/doc",
+      },
+      {
+        ext: "DOCX",
+        description: "Convert DOCX documents",
+        path: "/document-converter/docx",
+      },
+      {
+        ext: "TXT",
+        description: "Convert TXT documents",
+        path: "/document-converter/txt",
+      },
+      {
+        ext: "RTF",
+        description: "Convert RTF documents",
+        path: "/document-converter/rtf",
       },
     ],
   },
