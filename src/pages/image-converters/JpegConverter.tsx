@@ -1,27 +1,19 @@
-import { useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { useState } from 'react';
+import { handleConversion } from '@/utils/conversionHandler';
+import { FileUploader } from '@/components/FileUploader';
+import { ArrowLeft } from 'lucide-react';
 import { Link } from "react-router-dom";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import FileUploader from "@/components/FileUploader";
-import { toast } from "sonner";
-import { handleConversion } from "@/utils/conversionHandler";
-
-const outputFormats = [
-  { value: "png", label: "PNG" },
-  { value: "webp", label: "WebP" },
-  { value: "gif", label: "GIF" },
-];
 
 const JpegConverter = () => {
-  const [selectedFormat, setSelectedFormat] = useState(outputFormats[0].value);
+  const [selectedFormat, setSelectedFormat] = useState('png');
 
   const handleConvert = async (files: File[]) => {
-    await handleConversion({
+    return await handleConversion({
       files,
-      outputFormat: selectedFormat.toUpperCase(),
-      inputFormat: "JPG"
+      outputFormat: selectedFormat,
+      inputFormat: 'JPEG'
     });
-  }
+  };
 
   return (
     <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
@@ -33,9 +25,9 @@ const JpegConverter = () => {
         Back to Image Formats
       </Link>
       
-      <h1 className="text-3xl font-bold text-gray-900 mb-4">JPG Converter</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-4">JPEG Converter</h1>
       <p className="text-gray-600 mb-8">
-        Convert your JPG/JPEG images to other formats
+        Convert your JPEG images to other formats
       </p>
 
       <div className="bg-white rounded-lg shadow p-6 space-y-6">
@@ -43,27 +35,26 @@ const JpegConverter = () => {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Output Format
           </label>
-          <Select value={selectedFormat} onValueChange={setSelectedFormat}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select format" />
-            </SelectTrigger>
-            <SelectContent>
-              {outputFormats.map((format) => (
-                <SelectItem key={format.value} value={format.value}>
-                  {format.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <select 
+            value={selectedFormat}
+            onChange={(e) => setSelectedFormat(e.target.value)}
+            className="p-2 border rounded w-[180px]"
+          >
+            <option value="png">PNG</option>
+            <option value="webp">WebP</option>
+            <option value="gif">GIF</option>
+          </select>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Upload JPG Files
+            Upload JPEG Files
           </label>
           <FileUploader
-            acceptedFileTypes={[".jpg", ".jpeg"]}
+            acceptedFileTypes={[ ".jpeg"]}
+            maxFiles={10}
             onConvert={handleConvert}
+            outputFormat={selectedFormat}
           />
         </div>
       </div>

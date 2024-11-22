@@ -43,7 +43,6 @@ export const FileUploader = ({
   // Convert file extensions to MIME types
   const acceptedMimeTypes = {
     '.png': { 'image/png': [] },
-    '.jpg': { 'image/jpeg': [] },
     '.jpeg': { 'image/jpeg': [] },
     '.webp': { 'image/webp': [] },
     '.gif': { 'image/gif': [] },

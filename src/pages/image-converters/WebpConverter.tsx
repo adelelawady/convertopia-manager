@@ -7,9 +7,8 @@ import { handleConversion } from "@/utils/conversionHandler";
 
 const outputFormats = [
   { value: "png", label: "PNG" },
-  { value: "jpg", label: "JPG" },
+  { value: "jpeg", label: "JPEG" },
   { value: "gif", label: "GIF" },
-  { value: "pdf", label: "PDF" },
 ];
 
 const WebpConverter = () => {

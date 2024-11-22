@@ -34,7 +34,7 @@ const handleImageConversion = async (files: File[], outputFormat: string): Promi
       // Convert image using Python with format-specific optimizations
       const result = await pyodide.runPythonAsync(`
         from io import BytesIO
-        from PIL import Image, ImageEnhance
+        from PIL import Image
         import base64
 
         # Decode base64 image data
@@ -48,42 +48,41 @@ const handleImageConversion = async (files: File[], outputFormat: string): Promi
         if image.mode in ('RGBA', 'LA') or (image.mode == 'P' and 'transparency' in image.info):
             image = image.convert('RGB')
 
-        output_format = '${outputFormat.toLowerCase()}'
+        # Prepare output
         output = BytesIO()
+        output_format = '${outputFormat.toUpperCase()}'
 
-        if output_format == 'jpeg':
-            # Optimize for JPEG
-            enhancer = ImageEnhance.Sharpness(image)
-            image = enhancer.enhance(1.2)
-            enhancer = ImageEnhance.Contrast(image)
-            image = enhancer.enhance(1.1)
+        if output_format == "PNG":
+            # PNG optimization
             image.save(output, 
-                      format='JPEG', 
-                      quality=95, 
-                      optimize=True)
+                      format="PNG", 
+                      optimize=True,
+                      compress_level=9)  # Maximum compression
 
-        elif output_format == 'webp':
-            # Optimize for WebP
+        elif output_format == "JPEG":
+            # JPEG optimization
             image.save(output, 
-                      format='WEBP', 
-                      quality=90, 
-                      method=6,  # Highest compression method
+                      format="JPEG", 
+                      quality=95,  # High quality
+                      optimize=True,
+                      progressive=True)  # Progressive loading
+
+        elif output_format == "WEBP":
+            # WebP optimization
+            image.save(output, 
+                      format="WEBP", 
+                      quality=90,  # Good balance of quality and compression
+                      method=6,    # Highest compression method
                       lossless=False)
 
-        elif output_format == 'gif':
-            # Optimize for GIF
-            # Convert to adaptive palette for better color representation
+        elif output_format == "GIF":
+            # GIF optimization
             image = image.convert('P', palette=Image.Palette.ADAPTIVE, colors=256)
             image.save(output, 
-                      format='GIF', 
+                      format="GIF",
                       optimize=True)
 
-        else:
-            # Default save with basic optimization
-            image.save(output, 
-                      format=output_format.upper(), 
-                      quality=95 if output_format in ['jpeg', 'webp'] else None)
-
+        # Return the output bytes
         output.getvalue()
       `);
 
@@ -94,9 +93,12 @@ const handleImageConversion = async (files: File[], outputFormat: string): Promi
       const newFileName = `${file.name.split('.')[0]}.${outputFormat.toLowerCase()}`;
       const mimeTypes = {
         'jpeg': 'image/jpeg',
+        'jpg': 'image/jpeg',
+        'png': 'image/png',
         'webp': 'image/webp',
         'gif': 'image/gif'
       };
+
       const newFile = new File([convertedData], newFileName, {
         type: mimeTypes[outputFormat.toLowerCase()] || `image/${outputFormat.toLowerCase()}`
       });
