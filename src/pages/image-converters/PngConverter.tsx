@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import FileUploader from "@/components/FileUploader";
 import { handleConversion } from "@/utils/conversionHandler";
+import { usePyodide } from "@/hooks/usePyodide";
+import { toast } from "react-hot-toast";
 
 const outputFormats = [
   { value: "jpg", label: "JPG" },
@@ -14,13 +16,40 @@ const outputFormats = [
 
 const PngConverter = () => {
   const [selectedFormat, setSelectedFormat] = useState(outputFormats[0].value);
+  const { runPythonCode } = usePyodide();
 
   const handleConvert = async (files: File[]) => {
-    await handleConversion({
-      files,
-      outputFormat: selectedFormat.toUpperCase(),
-      inputFormat: "PNG"
-    });
+    try {
+      // Example Python code for image conversion
+      const pythonCode = `
+        from PIL import Image
+        import io
+        
+        def convert_image(image_data, output_format):
+            # Convert image data to PIL Image
+            img = Image.open(io.BytesIO(image_data))
+            
+            # Convert to RGB if necessary
+            if img.mode in ('RGBA', 'LA') or (img.mode == 'P' and 'transparency' in img.info):
+                img = img.convert('RGB')
+            
+            # Save to bytes
+            output = io.BytesIO()
+            img.save(output, format=output_format)
+            return output.getvalue()
+      `;
+
+      await runPythonCode(pythonCode);
+
+      await handleConversion({
+        files,
+        outputFormat: selectedFormat.toUpperCase(),
+        inputFormat: "PNG"
+      });
+    } catch (error) {
+      console.error('Conversion error:', error);
+      toast.error('Failed to convert image');
+    }
   };
 
   return (

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enhanced PNG to JPEG Converter</title>
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
+</head>
+<body>
+  <h1>Enhanced PNG to JPEG Converter</h1>
+  <p>Select a PNG file to convert to a high-quality JPEG.</p>
+  <input type="file" id="fileInput" accept=".png" />
+  <button onclick="convertImage()">Convert to JPEG</button>
+  <p>Converted Image (High Quality):</p>
+  <img id="outputImage" alt="Converted JPEG will appear here" style="max-width: 100%;" />
+
+  <script>
+    let pyodideReady = false;
+
+    // Load Pyodide and Pillow for Python-based image processing
+    async function loadPyodideAndPillow() {
+      try {
+        console.log('Loading Pyodide...');
+        window.pyodide = await loadPyodide();
+        await pyodide.loadPackage(["micropip"]);
+        console.log('Pyodide loaded, installing Pillow...');
+        await pyodide.runPythonAsync(`
+          import micropip
+          await micropip.install("pillow")
+        `);
+        console.log('Pillow installed.');
+        pyodideReady = true;
+      } catch (error) {
+        console.error('Error loading Pyodide or Pillow:', error);
+        alert('Error loading Pyodide or Pillow. Please reload the page.');
+      }
+    }
+
+    // Function to convert Uint8Array to base64 in chunks to avoid memory issues
+    function uint8ArrayToBase64(bytes) {
+      const CHUNK_SIZE = 0x8000; // Process in 32KB chunks
+      let base64 = '';
+      for (let i = 0; i < bytes.length; i += CHUNK_SIZE) {
+        base64 += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK_SIZE));
+      }
+      return btoa(base64);
+    }
+
+    // Resize the image using canvas before processing (optional for better quality control)
+    function resizeImage(file, maxWidth, maxHeight, callback) {
+      const img = new Image();
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        img.src = e.target.result;
+      };
+
+      img.onload = function () {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        let width = img.width;
+        let height = img.height;
+
+        // Maintain aspect ratio during resizing
+        if (width > maxWidth || height > maxHeight) {
+          if (width > height) {
+            height = (height * maxWidth) / width;
+            width = maxWidth;
+          } else {
+            width = (width * maxHeight) / height;
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob(callback, 'image/png'); // Output resized image as Blob
+      };
+
+      reader.readAsDataURL(file);
+    }
+
+    async function convertImage() {
+      if (!pyodideReady) {
+        alert("Pyodide is still loading. Please wait.");
+        return;
+      }
+
+      const fileInput = document.getElementById("fileInput");
+      if (!fileInput.files.length) {
+        alert("Please select a PNG file.");
+        return;
+      }
+
+      const file = fileInput.files[0];
+
+      // Resize the image to a maximum resolution of 1920x1080
+      resizeImage(file, 1920, 1080, async (resizedBlob) => {
+        const reader = new FileReader();
+        reader.onload = async function (event) {
+          const arrayBuffer = event.target.result;
+          console.log('Image loaded, processing in Pyodide...');
+
+          try {
+            const bytesData = new Uint8Array(arrayBuffer);
+            const base64String = uint8ArrayToBase64(bytesData);
+
+            // Convert PNG to high-quality JPEG using Pillow
+            const result = await pyodide.runPythonAsync(`
+from io import BytesIO
+from PIL import Image, ImageEnhance
+import base64
+
+# Decode base64 image data
+image_data = base64.b64decode("${base64String}")
+
+# Load the PNG image
+png_data = BytesIO(image_data)
+image = Image.open(png_data)
+
+# Enhance the image quality (sharpen and enhance contrast)
+enhancer = ImageEnhance.Sharpness(image)
+image = enhancer.enhance(2.0)  # Sharpen the image
+
+enhancer = ImageEnhance.Contrast(image)
+image = enhancer.enhance(1.5)  # Enhance contrast
+
+# Convert to high-quality JPEG
+jpeg_data = BytesIO()
+image.convert("RGB").save(jpeg_data, format="JPEG", quality=95)  # Set quality to 95
+
+# Return the JPEG bytes
+jpeg_data.getvalue()
+            `);
+
+            const jpegBytes = new Uint8Array(result.toJs());
+            const jpegBase64 = uint8ArrayToBase64(jpegBytes);
+
+            // Display the converted image
+            document.getElementById("outputImage").src = `data:image/jpeg;base64,${jpegBase64}`;
+            console.log('Image converted successfully.');
+          } catch (error) {
+            console.error('Error processing the image:', error);
+            alert("Error processing the image. Please ensure the file is a valid PNG.");
+          }
+        };
+
+        reader.readAsArrayBuffer(resizedBlob);
+      });
+    }
+
+    loadPyodideAndPillow(); // Initialize Pyodide and Pillow on page load
+  </script>
+</body>
+</html>

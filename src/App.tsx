@@ -30,6 +30,8 @@ import DocxConverter from "./pages/document-converters/DocxConverter";
 import TxtConverter from "./pages/document-converters/TxtConverter";
 import RtfConverter from "./pages/document-converters/RtfConverter";
 
+import { PyodideProvider } from "@/components/PyodideLoader";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -38,40 +40,42 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <div className="min-h-screen flex flex-col">
-          <Navbar />
-          <main className="flex-1 bg-gray-50">
-            <Routes>
-              <Route path="/" element={<Index />} />
-              
-              {/* Main converter routes */}
-              <Route path="/image-converter" element={<ImageConverter />} />
-              <Route path="/audio-converter" element={<AudioConverter />} />
-              <Route path="/document-converter" element={<DocumentConverter />} />
+        <PyodideProvider>
+          <div className="min-h-screen flex flex-col">
+            <Navbar />
+            <main className="flex-1 bg-gray-50">
+              <Routes>
+                <Route path="/" element={<Index />} />
+                
+                {/* Main converter routes */}
+                <Route path="/image-converter" element={<ImageConverter />} />
+                <Route path="/audio-converter" element={<AudioConverter />} />
+                <Route path="/document-converter" element={<DocumentConverter />} />
 
-              {/* Image converter sub-routes */}
-              <Route path="/image-converter/png" element={<PngConverter />} />
-              <Route path="/image-converter/jpg" element={<JpgConverter />} />
-              <Route path="/image-converter/webp" element={<WebpConverter />} />
-              <Route path="/image-converter/gif" element={<GifConverter />} />
+                {/* Image converter sub-routes */}
+                <Route path="/image-converter/png" element={<PngConverter />} />
+                <Route path="/image-converter/jpg" element={<JpgConverter />} />
+                <Route path="/image-converter/webp" element={<WebpConverter />} />
+                <Route path="/image-converter/gif" element={<GifConverter />} />
 
-              {/* Audio converter sub-routes */}
-              <Route path="/audio-converter/mp3" element={<Mp3Converter />} />
-              <Route path="/audio-converter/wav" element={<WavConverter />} />
-              <Route path="/audio-converter/ogg" element={<OggConverter />} />
-              <Route path="/audio-converter/m4a" element={<M4aConverter />} />
-              <Route path="/audio-converter/flac" element={<FlacConverter />} />
+                {/* Audio converter sub-routes */}
+                <Route path="/audio-converter/mp3" element={<Mp3Converter />} />
+                <Route path="/audio-converter/wav" element={<WavConverter />} />
+                <Route path="/audio-converter/ogg" element={<OggConverter />} />
+                <Route path="/audio-converter/m4a" element={<M4aConverter />} />
+                <Route path="/audio-converter/flac" element={<FlacConverter />} />
 
-              {/* Document converter sub-routes */}
-              <Route path="/document-converter/pdf" element={<PdfConverter />} />
-              <Route path="/document-converter/doc" element={<DocConverter />} />
-              <Route path="/document-converter/docx" element={<DocxConverter />} />
-              <Route path="/document-converter/txt" element={<TxtConverter />} />
-              <Route path="/document-converter/rtf" element={<RtfConverter />} />
-            </Routes>
-          </main>
-          <Footer />
-        </div>
+                {/* Document converter sub-routes */}
+                <Route path="/document-converter/pdf" element={<PdfConverter />} />
+                <Route path="/document-converter/doc" element={<DocConverter />} />
+                <Route path="/document-converter/docx" element={<DocxConverter />} />
+                <Route path="/document-converter/txt" element={<TxtConverter />} />
+                <Route path="/document-converter/rtf" element={<RtfConverter />} />
+              </Routes>
+            </main>
+            <Footer />
+          </div>
+        </PyodideProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
