@@ -43,6 +43,7 @@ const WebpConverter = () => {
             <option value="jpeg">JPEG</option>
             <option value="png">PNG</option>
             <option value="gif">GIF</option>
+            <option value="ico">ico</option>
           </select>
         </div>
 

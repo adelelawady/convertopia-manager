@@ -51,6 +51,32 @@ const ImageConverter = () => {
         "Format flexibility"
       ]
     }
+    ,
+    {
+      title: "Ico Converter",
+      description: "Convert Ico images to PNG, JPEG, or WebP formats",
+      path: "/image-converter/ico",
+      icon: "/icons/ico-icon.svg",
+      formats: ["PNG", "JPEG", "WebP","gif","bmp"],
+      features: [
+        "Animation support",
+        "Frame extraction",
+        "Format flexibility"
+      ]
+    }
+    ,
+    {
+      title: "Bmp Converter",
+      description: "Convert Bmp images to PNG, JPEG, or WebP formats",
+      path: "/image-converter/bmp",
+      icon: "/icons/bmp-icon.svg",
+      formats: ["PNG", "JPEG", "WebP","gif","ico"],
+      features: [
+        "Animation support",
+        "Frame extraction",
+        "Format flexibility"
+      ]
+    }
   ];
 
   return (

@@ -44,8 +44,11 @@ export const FileUploader = ({
   const acceptedMimeTypes = {
     '.png': { 'image/png': [] },
     '.jpeg': { 'image/jpeg': [] },
+    '.jpg': { 'image/jpeg': [] },
     '.webp': { 'image/webp': [] },
     '.gif': { 'image/gif': [] },
+    '.ico': { 'image/x-icon': [], 'image/vnd.microsoft.icon': [] },
+    '.bmp': { 'image/bmp': [] }
   };
 
   const accept = acceptedFileTypes.reduce((acc, type) => ({

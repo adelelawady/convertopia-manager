@@ -31,6 +31,8 @@ import TxtConverter from "./pages/document-converters/TxtConverter";
 import RtfConverter from "./pages/document-converters/RtfConverter";
 
 import { PyodideProvider } from "@/components/PyodideLoader";
+import IcoConverter from "./pages/image-converters/IcoConverter";
+import BmpConverter from "./pages/image-converters/BmpConverter";
 
 const queryClient = new QueryClient();
 
@@ -57,6 +59,8 @@ const App = () => (
                 <Route path="/image-converter/jpeg" element={<JpegConverter />} />
                 <Route path="/image-converter/webp" element={<WebpConverter />} />
                 <Route path="/image-converter/gif" element={<GifConverter />} />
+                <Route path="/image-converter/ico" element={<IcoConverter />} />
+                <Route path="/image-converter/bmp" element={<BmpConverter />} />
 
                 {/* Audio converter sub-routes */}
                 <Route path="/audio-converter/mp3" element={<Mp3Converter />} />

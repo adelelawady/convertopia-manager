@@ -62,6 +62,16 @@ const converterCategories = [
         description: "Convert GIF images",
         path: "/image-converter/gif",
       },
+      {
+        ext: "ICO",
+        description: "Convert Ico files",
+        path: "/image-converter/ico",
+      },
+      {
+        ext: "BMP",
+        description: "Convert bmp images",
+        path: "/image-converter/bmp",
+      },
     ],
   },
   {

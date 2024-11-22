@@ -31,7 +31,6 @@ const handleImageConversion = async (files: File[], outputFormat: string): Promi
           .join('')
       );
 
-      console.log(outputFormat);
       // Convert image using Python with format-specific optimizations
       const result = await pyodide.runPythonAsync(`
         from io import BytesIO
@@ -45,11 +44,31 @@ const handleImageConversion = async (files: File[], outputFormat: string): Promi
         img_data = BytesIO(image_data)
         image = Image.open(img_data)
 
-        # Always convert GIF and palette images to RGB before processing
-        if image.format == 'GIF' or image.mode == 'P':
+        # For ICO files, get the largest size
+        if image.format == 'ICO':
+            try:
+                sizes = list(image.info.get('sizes', [(image.width, image.height)]))
+                largest_size = max(sizes, key=lambda x: x[0] * x[1])
+                for size in image.info.get('sizes', []):
+                    if size == largest_size:
+                        image.size = size
+                        image.load()
+                        break
+            except Exception as e:
+                print(f"Error handling ICO sizes: {e}")
+                pass
+
+        # Handle color modes
+        if image.mode == 'P':
+            if 'transparency' in image.info:
+                image = image.convert('RGBA')
+            else:
+                image = image.convert('RGB')
+        elif image.mode == '1':  # Binary (black and white)
             image = image.convert('RGB')
-        # Convert other formats with transparency to RGB
-        elif image.mode in ('RGBA', 'LA'):
+        elif image.mode in ('LA', 'L'):  # Grayscale with/without alpha
+            image = image.convert('RGBA' if 'A' in image.mode else 'RGB')
+        elif image.mode == 'RGBA' and output_format.upper() == 'JPEG':
             image = image.convert('RGB')
 
         # Prepare output
@@ -57,34 +76,39 @@ const handleImageConversion = async (files: File[], outputFormat: string): Promi
         output_format = '${outputFormat.toUpperCase()}'
 
         if output_format == "PNG":
-            # PNG optimization
             image.save(output, 
                       format="PNG", 
                       optimize=True,
-                      compress_level=9)  # Maximum compression
+                      compress_level=9)
 
         elif output_format == "JPEG":
-            # JPEG optimization
             image.save(output, 
                       format="JPEG", 
-                      quality=95,  # High quality
+                      quality=95,
                       optimize=True,
-                      progressive=True)  # Progressive loading
+                      progressive=True)
 
         elif output_format == "WEBP":
-            # WebP optimization
             image.save(output, 
                       format="WEBP", 
-                      quality=90,  # Good balance of quality and compression
-                      method=6,    # Highest compression method
+                      quality=90,
+                      method=6,
                       lossless=False)
 
         elif output_format == "GIF":
-            # Convert to palette mode for GIF
             image = image.convert('P', palette=Image.Palette.ADAPTIVE, colors=256)
             image.save(output, 
                       format="GIF",
                       optimize=True)
+
+        elif output_format == "ICO":
+            image.save(output, 
+                      format="ICO",
+                      sizes=[(32, 32), (48, 48), (64, 64)])
+
+        elif output_format == "BMP":
+            image.save(output, 
+                      format="BMP")
 
         # Return the output bytes
         output.getvalue()
@@ -99,14 +123,15 @@ const handleImageConversion = async (files: File[], outputFormat: string): Promi
         'jpeg': 'image/jpeg',
         'png': 'image/png',
         'webp': 'image/webp',
-        'gif': 'image/gif'
+        'gif': 'image/gif',
+        'ico': 'image/x-icon',
+        'bmp': 'image/bmp'
       };
 
       const newFile = new File([convertedData], newFileName, {
         type: mimeTypes[outputFormat.toLowerCase()] || `image/${outputFormat.toLowerCase()}`
       });
 
-      // Create object URL for the file
       const url = URL.createObjectURL(newFile);
 
       return {
@@ -152,6 +177,8 @@ export const handleConversion = async ({ files, outputFormat, inputFormat }: Con
       case 'jpeg':
       case 'webp':
       case 'gif':
+      case 'ico':
+      case 'bmp':
         convertedFiles = await handleImageConversion(files, outputFormat);
         break;
       case 'pdf':
