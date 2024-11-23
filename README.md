@@ -57,6 +57,7 @@ npm start
 - ⚛️ React 18
 - 📘 TypeScript
 - 🎨 Tailwind CSS
+- 🎨 Tabler
 - 🔧 Vite
 - 🎬 FFmpeg.wasm
 - 🐍 Pyodide
@@ -148,4 +149,4 @@ For support, please open an issue in the GitHub repository or contact the mainta
 
 ---
 
-Made with ❤️ by [AdelElawady/Team]
+Made with ❤️ by [AdelElawady]
