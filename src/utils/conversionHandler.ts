@@ -353,99 +353,73 @@ const handleAudioConversion = async (files: File[], outputFormat: string): Promi
   try {
     await loadFFmpeg();
 
+    // Format-specific settings
+    const conversionSettings = {
+      mp3: {
+        wav: ['-c:a', 'pcm_s24le', '-ar', '48000', '-bitexact'],
+        ogg: ['-c:a', 'libvorbis', '-q:a', '8', '-ar', '48000'],
+        m4a: ['-c:a', 'aac', '-b:a', '256k', '-ar', '48000', '-movflags', '+faststart'],
+        flac: ['-c:a', 'flac', '-compression_level', '8', '-ar', '48000']
+      },
+      wav: {
+        mp3: ['-c:a', 'libmp3lame', '-q:a', '0', '-b:a', '320k', '-ar', '48000'],
+        ogg: ['-c:a', 'libvorbis', '-q:a', '10', '-ar', '48000'],
+        m4a: ['-c:a', 'aac', '-b:a', '320k', '-ar', '48000', '-movflags', '+faststart'],
+        flac: ['-c:a', 'flac', '-compression_level', '12', '-ar', '96000']
+      },
+      ogg: {
+        mp3: ['-c:a', 'libmp3lame', '-q:a', '0', '-b:a', '320k', '-ar', '48000'],
+        wav: ['-c:a', 'pcm_s24le', '-ar', '48000', '-bitexact'],
+        m4a: ['-c:a', 'aac', '-b:a', '256k', '-ar', '48000', '-movflags', '+faststart'],
+        flac: ['-c:a', 'flac', '-compression_level', '12', '-ar', '96000']
+      },
+      m4a: {
+        mp3: ['-c:a', 'libmp3lame', '-q:a', '0', '-b:a', '320k', '-ar', '48000'],
+        wav: ['-c:a', 'pcm_s24le', '-ar', '48000', '-bitexact'],
+        ogg: ['-c:a', 'libvorbis', '-q:a', '9', '-ar', '48000'],
+        flac: ['-c:a', 'flac', '-compression_level', '12', '-ar', '96000']
+      },
+      flac: {
+        mp3: ['-c:a', 'libmp3lame', '-q:a', '0', '-b:a', '320k', '-ar', '48000'],
+        wav: ['-c:a', 'pcm_s24le', '-ar', '96000', '-bitexact'],
+        ogg: ['-c:a', 'libvorbis', '-q:a', '10', '-ar', '48000'],
+        m4a: ['-c:a', 'aac', '-b:a', '320k', '-ar', '48000', '-movflags', '+faststart']
+      }
+    };
+
     const results = await Promise.all(files.map(async (file) => {
       const inputFileName = `input-${Date.now()}.${file.name.split('.').pop()}`;
       const outputFileName = `output-${Date.now()}.${outputFormat.toLowerCase()}`;
+      const inputFormat = file.name.split('.').pop()?.toLowerCase();
 
       try {
         // Write input file
         await ffmpeg.writeFile(inputFileName, await fetchFile(file));
-
-        // Set conversion arguments based on format
         const ffmpegArgs = ['-i', inputFileName];
-        
-        // Add input format specific settings
-        if (file.name.toLowerCase().endsWith('.wav')) {
-          ffmpegArgs.push('-ar', '44100'); // Set sample rate for WAV
-        } else if (file.name.toLowerCase().endsWith('.ogg')) {
-          ffmpegArgs.push('-acodec', 'libvorbis'); // Specify OGG decoder
-        } else if (file.name.toLowerCase().endsWith('.m4a')) {
-          ffmpegArgs.push('-acodec', 'aac'); // Specify AAC decoder for M4A
-        } else if (file.name.toLowerCase().endsWith('.flac')) {
-          ffmpegArgs.push(
-            '-acodec', 'flac',  // Specify FLAC decoder
-            '-sample_fmt', 's32'  // Use 32-bit sample format for best quality
-          );
-        }
-        
-        // Output format specific settings
-        switch (outputFormat.toLowerCase()) {
-          case 'mp3':
-            ffmpegArgs.push(
-              '-c:a', 'libmp3lame',
-              '-q:a', '0',  // Highest quality for MP3 (0-9, lower is better)
-              '-joint_stereo', '1',  // Use joint stereo
-              '-b:a', '320k',  // Maximum bitrate
-              '-ar', '48000'  // High sample rate
-            );
-            break;
-          case 'ogg':
-            ffmpegArgs.push(
-              '-c:a', 'libvorbis',
-              '-q:a', '10',  // Highest quality setting (0-10)
-              '-compression_level', '10',  // Maximum compression
-              '-ar', '48000'  // High sample rate
-            );
-            break;
-          case 'm4a':
-            ffmpegArgs.push(
-              '-c:a', 'aac',
-              '-b:a', '320k',  // Maximum bitrate
-              '-profile:a', 'aac_low',  // AAC profile
-              '-movflags', '+faststart',  // Optimize for streaming
-              '-ar', '48000',  // High sample rate
-              '-strict', 'experimental'  // Allow experimental codecs
-            );
-            break;
-          case 'flac':
-            ffmpegArgs.push(
-              '-c:a', 'flac',
-              '-compression_level', '12',  // Maximum compression
-              '-sample_fmt', 's32',  // 32-bit sample format
-              '-ar', '96000'  // Highest sample rate
-            );
-            break;
-          case 'wav':
-            ffmpegArgs.push(
-              '-c:a', 'pcm_s24le',  // 24-bit PCM
-              '-ar', '96000',  // High sample rate
-              '-bitexact'  // Ensure exact audio reproduction
-            );
-            break;
-          default:
-            throw new Error(`Unsupported output format: ${outputFormat}`);
-        }
-        
-        ffmpegArgs.push(outputFileName);
 
-        // Run conversion
+        // Apply format-specific settings
+        const args = conversionSettings[inputFormat]?.[outputFormat.toLowerCase()];
+        if (!args) {
+          throw new Error(`Unsupported conversion: ${inputFormat} to ${outputFormat}`);
+        }
+        ffmpegArgs.push(...args, outputFileName);
+
+        // Execute FFmpeg command
         await ffmpeg.exec(ffmpegArgs);
 
-        // Read output file
+        // Read and create output file
         const data = await ffmpeg.readFile(outputFileName);
-        
         if (!(data instanceof Uint8Array)) {
           throw new Error('Converted file data is not in the expected format');
         }
 
-        // Create output file
         const newFileName = `${file.name.split('.')[0]}.${outputFormat.toLowerCase()}`;
-        const mimeTypes = {
-          'wav': 'audio/wav',
-          'ogg': 'audio/ogg',
-          'm4a': 'audio/mp4',
-          'flac': 'audio/flac',
-          'mp3': 'audio/mpeg'
+        const mimeTypes: { [key: string]: string } = {
+          wav: 'audio/wav',
+          ogg: 'audio/ogg',
+          m4a: 'audio/mp4',
+          flac: 'audio/flac',
+          mp3: 'audio/mpeg'
         };
 
         const newFile = new File([data], newFileName, {
@@ -479,4 +453,4 @@ const handleAudioConversion = async (files: File[], outputFormat: string): Promi
     toast.error(`Failed to convert audio: ${error instanceof Error ? error.message : 'Unknown error'}`);
     throw error;
   }
-}; 
+};

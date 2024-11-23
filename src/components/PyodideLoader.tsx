@@ -75,7 +75,13 @@ export const PyodideProvider = ({ children }: PyodideLoaderProps) => {
           <div className="text-sm text-gray-500">
             This might take a few moments
           </div>
+          <div className="mt-12 text-center">
+        <p className="text-sm text-gray-500">
+          All conversions are processed locally in your browser for maximum privacy and speed
+        </p>
+      </div>
         </div>
+        
       </div>
     );
   }
