@@ -364,21 +364,45 @@ const handleAudioConversion = async (files: File[], outputFormat: string): Promi
         // Set conversion arguments based on format
         const ffmpegArgs = ['-i', inputFileName];
         
+        // Add input format specific settings for WAV
+        if (file.name.toLowerCase().endsWith('.wav')) {
+          ffmpegArgs.push('-ar', '44100'); // Set sample rate
+        }
+        
+        // Output format specific settings
         switch (outputFormat.toLowerCase()) {
           case 'mp3':
-            ffmpegArgs.push('-c:a', 'libmp3lame', '-q:a', '2');
+            ffmpegArgs.push(
+              '-c:a', 'libmp3lame',
+              '-q:a', '2',  // Quality setting (0-9, lower is better)
+              '-joint_stereo', '1'  // Use joint stereo
+            );
             break;
           case 'ogg':
-            ffmpegArgs.push('-c:a', 'libvorbis', '-q:a', '4');
+            ffmpegArgs.push(
+              '-c:a', 'libvorbis',
+              '-q:a', '6',  // Quality setting (0-10, higher is better)
+              '-compression_level', '10'  // Maximum compression
+            );
             break;
           case 'm4a':
-            ffmpegArgs.push('-c:a', 'aac', '-b:a', '192k');
+            ffmpegArgs.push(
+              '-c:a', 'aac',
+              '-b:a', '192k',  // Bitrate
+              '-profile:a', 'aac_low'  // AAC profile
+            );
             break;
           case 'flac':
-            ffmpegArgs.push('-c:a', 'flac');
+            ffmpegArgs.push(
+              '-c:a', 'flac',
+              '-compression_level', '12'  // Maximum compression
+            );
             break;
           case 'wav':
-            ffmpegArgs.push('-c:a', 'pcm_s16le');
+            ffmpegArgs.push(
+              '-c:a', 'pcm_s16le',  // 16-bit PCM
+              '-ar', '44100'  // CD quality sample rate
+            );
             break;
           default:
             throw new Error(`Unsupported output format: ${outputFormat}`);
