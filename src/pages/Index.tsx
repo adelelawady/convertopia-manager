@@ -5,6 +5,7 @@ import { FileText, Image, Music } from "lucide-react";
 const converterCategories = [
   
   {
+    disabled:false,
     title: "Image Converter",
     description: "Convert images between different formats",
     icon: Image,
@@ -41,8 +42,11 @@ const converterCategories = [
         path: "/image-converter/bmp",
       },
     ],
-  },
+  }
+  
+  ,
   {
+    disabled:true,
     title: "Document Converter",
     description: "Convert documents between different formats",
     icon: FileText,
@@ -75,7 +79,9 @@ const converterCategories = [
       },
     ],
   },
+  
   {
+    disabled:false,
     title: "Audio Converter",
     description: "Convert audio files between different formats",
     icon: Music,
@@ -123,7 +129,7 @@ const Index = () => {
           </p>
         </div>
 
-        {converterCategories.map((category) => (
+        {converterCategories.map((category) => !category.disabled && (
           <div key={category.title} className="mb-16">
             <div className="flex items-center gap-3 mb-6">
               <div className={`p-2 rounded-lg ${category.color}`}>

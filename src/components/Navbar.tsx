@@ -7,7 +7,7 @@ const Navbar = () => {
     { path: "/", label: "Home" },
     { path: "/image-converter", label: "Image Converter" },
     { path: "/audio-converter", label: "Audio Converter" },
-    { path: "/document-converter", label: "Document Converter" },
+   // { path: "/document-converter", label: "Document Converter" },
   ];
 
   return (

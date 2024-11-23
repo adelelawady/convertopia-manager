@@ -36,5 +36,11 @@ export default defineConfig(({ mode }) => ({
         },
       },
     },
+      // Add this section to copy service worker files to output directory
+  publicDir: {
+    include: ['**/*'],
+    exclude: [],
+  }
   },
+  
 }));
