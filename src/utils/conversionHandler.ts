@@ -6,8 +6,8 @@ import { getDocument } from 'pdfjs-dist';
 const pdfjsWorker = new URL('pdfjs-dist/build/pdf.worker.js', import.meta.url);
 
 import {Buffer} from 'Buffer';
-import { FFmpeg } from '@ffmpeg/ffmpeg';
-import { fetchFile, toBlobURL } from '@ffmpeg/util';
+import { FFmpeg } from 'https://unpkg.com/@ffmpeg/ffmpeg@0.12.7/dist/esm/index.js';
+import { fetchFile } from 'https://unpkg.com/@ffmpeg/util@0.12.1/dist/esm/index.js';
 import { useState, useRef } from "react";
 
 // Initialize PDF.js worker
@@ -327,6 +327,8 @@ const handleDocumentConversion = async (files: File[], outputFormat: string): Pr
   }
 };
 
+const basename = import.meta.env.DEV ? '' : '/convertopia-manager';
+
 // Create a singleton FFmpeg instance
 const ffmpeg = new FFmpeg();
 let loaded = false;
@@ -334,19 +336,28 @@ let loaded = false;
 const loadFFmpeg = async () => {
   if (loaded) return;
 
-  const baseURL = 'https://unpkg.com/@ffmpeg/core-mt@0.12.6/dist/esm';
-  
-  ffmpeg.on('log', ({ message }) => {
-    console.log(message);
-  });
+  try {
+    ffmpeg.on('log', ({ message }) => {
+      console.log('FFmpeg Log:', message);
+    });
 
-  await ffmpeg.load({
-    coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-    wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
-    workerURL: await toBlobURL(`${baseURL}/ffmpeg-core.worker.js`, 'text/javascript'),
-  });
+    // Load FFmpeg with CDN URLs and proper base path
+    await ffmpeg.load({
+      coreURL: `${basename}/ffmpeg/ffmpeg-core.js`,
+      wasmURL: `${basename}/ffmpeg/ffmpeg-core.wasm`,
+      workerURL: `${basename}/ffmpeg/ffmpeg-core.worker.js`
+    });
 
-  loaded = true;
+    loaded = true;
+    console.log('FFmpeg loaded successfully');
+  } catch (error) {
+    console.error('Error loading FFmpeg:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    if (errorMessage.includes('SharedArrayBuffer')) {
+      throw new Error('This browser does not support the required features. Please use a modern browser with cross-origin isolation enabled.');
+    }
+    throw error;
+  }
 };
 
 const handleAudioConversion = async (files: File[], outputFormat: string): Promise<ConvertedFile[]> => {
