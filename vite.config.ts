@@ -13,7 +13,6 @@ export default defineConfig(({ mode }) => ({
       'Cross-Origin-Embedder-Policy': 'require-corp',
       'Cross-Origin-Opener-Policy': 'same-origin',
       'Cross-Origin-Resource-Policy': 'cross-origin',
-      'Cross-Origin-Isolation': 'enable'
     },
   },
   plugins: [
@@ -26,21 +25,16 @@ export default defineConfig(({ mode }) => ({
     },
   },
   optimizeDeps: {
-    exclude: [
-      '@ffmpeg/ffmpeg',
-      '@ffmpeg/util',
-      '@ffmpeg/core-mt'
-    ],
+    exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/util'],
+    include: ['@ffmpeg/core'],
   },
   build: {
-    commonjsOptions: {
-      include: [/@ffmpeg\/.*/, /node_modules/],
-    },
     rollupOptions: {
-      external: [
-        'https://unpkg.com/@ffmpeg/ffmpeg@0.12.7/dist/esm/index.js',
-        'https://unpkg.com/@ffmpeg/util@0.12.1/dist/esm/index.js'
-      ],
+      output: {
+        manualChunks: {
+          ffmpeg: ['@ffmpeg/ffmpeg', '@ffmpeg/util', '@ffmpeg/core'],
+        },
+      },
     },
   },
 }));

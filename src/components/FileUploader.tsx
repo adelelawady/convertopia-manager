@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
@@ -76,15 +76,6 @@ export const FileUploader = ({
   outputFormat,
 }: FileUploaderProps) => {
   const [files, setFiles] = useState<UploadedFile[]>([]);
-  const [browserSupported, setBrowserSupported] = useState(true);
-
-  useEffect(() => {
-    // Check if SharedArrayBuffer is supported
-    if (typeof SharedArrayBuffer === 'undefined') {
-      setBrowserSupported(false);
-      toast.error('Your browser does not support some required features. Please use a modern browser.');
-    }
-  }, []);
 
   // Create accept object for dropzone based on input format
   const acceptObject = acceptedFileTypes.reduce((acc, type) => {
@@ -215,17 +206,6 @@ export const FileUploader = ({
     a.click();
     document.body.removeChild(a);
   };
-
-  if (!browserSupported) {
-    return (
-      <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-        <p className="text-yellow-800">
-          Your browser does not support some required features for audio conversion. 
-          Please use a modern browser like Chrome, Edge, or Firefox with cross-origin isolation enabled.
-        </p>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-4">
