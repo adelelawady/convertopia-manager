@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Link } from "react-router-dom";
+import { Heart } from "lucide-react";
 
 const basename = import.meta.env.DEV ? '' : '/convertopia-manager';
 
@@ -146,8 +147,8 @@ const converterCategories = [
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="flex-grow max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             Convertopia Manager
@@ -215,6 +216,7 @@ const Index = () => {
           </div>
         ))}
       </div>
+
     </div>
   );
 };

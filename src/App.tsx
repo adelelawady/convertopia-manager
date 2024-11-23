@@ -33,6 +33,8 @@ import RtfConverter from "./pages/document-converters/RtfConverter";
 import { PyodideProvider } from "@/components/PyodideLoader";
 import IcoConverter from "./pages/image-converters/IcoConverter";
 import BmpConverter from "./pages/image-converters/BmpConverter";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
 
 const queryClient = new QueryClient();
 const basename = import.meta.env.DEV ? '' : '/convertopia-manager';
@@ -77,6 +79,8 @@ const App = () => (
                 <Route path="/document-converter/docx" element={<DocxConverter />} />
                 <Route path="/document-converter/txt" element={<TxtConverter />} />
                 <Route path="/document-converter/rtf" element={<RtfConverter />} />
+                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                <Route path="/terms-of-service" element={<TermsOfService />} />
               </Routes>
             </main>
             <Footer />
