@@ -364,9 +364,18 @@ const handleAudioConversion = async (files: File[], outputFormat: string): Promi
         // Set conversion arguments based on format
         const ffmpegArgs = ['-i', inputFileName];
         
-        // Add input format specific settings for WAV
+        // Add input format specific settings
         if (file.name.toLowerCase().endsWith('.wav')) {
-          ffmpegArgs.push('-ar', '44100'); // Set sample rate
+          ffmpegArgs.push('-ar', '44100'); // Set sample rate for WAV
+        } else if (file.name.toLowerCase().endsWith('.ogg')) {
+          ffmpegArgs.push('-acodec', 'libvorbis'); // Specify OGG decoder
+        } else if (file.name.toLowerCase().endsWith('.m4a')) {
+          ffmpegArgs.push('-acodec', 'aac'); // Specify AAC decoder for M4A
+        } else if (file.name.toLowerCase().endsWith('.flac')) {
+          ffmpegArgs.push(
+            '-acodec', 'flac',  // Specify FLAC decoder
+            '-sample_fmt', 's32'  // Use 32-bit sample format for best quality
+          );
         }
         
         // Output format specific settings
@@ -374,34 +383,48 @@ const handleAudioConversion = async (files: File[], outputFormat: string): Promi
           case 'mp3':
             ffmpegArgs.push(
               '-c:a', 'libmp3lame',
-              '-q:a', '2',  // Quality setting (0-9, lower is better)
-              '-joint_stereo', '1'  // Use joint stereo
+              '-q:a', '0',  // Highest quality for MP3 (0-9, lower is better)
+              '-joint_stereo', '1',  // Use joint stereo
+              '-b:a', '320k',  // Maximum bitrate
+              '-ar', '48000',  // High sample rate
+              '-af', 'aresample=resampler=soxr:precision=28:dither_method=triangular'  // High quality resampling
             );
             break;
           case 'ogg':
             ffmpegArgs.push(
               '-c:a', 'libvorbis',
-              '-q:a', '6',  // Quality setting (0-10, higher is better)
-              '-compression_level', '10'  // Maximum compression
+              '-q:a', '10',  // Highest quality setting (0-10)
+              '-compression_level', '10',  // Maximum compression
+              '-ar', '48000',  // High sample rate
+              '-af', 'aresample=resampler=soxr:precision=28'  // High quality resampling
             );
             break;
           case 'm4a':
             ffmpegArgs.push(
               '-c:a', 'aac',
-              '-b:a', '192k',  // Bitrate
-              '-profile:a', 'aac_low'  // AAC profile
+              '-b:a', '320k',  // Maximum bitrate
+              '-profile:a', 'aac_low',  // AAC profile
+              '-movflags', '+faststart',  // Optimize for streaming
+              '-ar', '48000',  // High sample rate
+              '-af', 'aresample=resampler=soxr:precision=28',  // High quality resampling
+              '-strict', 'experimental'  // Allow experimental codecs
             );
             break;
           case 'flac':
             ffmpegArgs.push(
               '-c:a', 'flac',
-              '-compression_level', '12'  // Maximum compression
+              '-compression_level', '12',  // Maximum compression
+              '-sample_fmt', 's32',  // 32-bit sample format
+              '-ar', '96000',  // Highest sample rate
+              '-af', 'aresample=resampler=soxr:precision=33'  // Ultra-high quality resampling
             );
             break;
           case 'wav':
             ffmpegArgs.push(
-              '-c:a', 'pcm_s16le',  // 16-bit PCM
-              '-ar', '44100'  // CD quality sample rate
+              '-c:a', 'pcm_s24le',  // 24-bit PCM
+              '-ar', '96000',  // High sample rate
+              '-af', 'aresample=resampler=soxr:precision=28',  // High quality resampling
+              '-bitexact'  // Ensure exact audio reproduction
             );
             break;
           default:
