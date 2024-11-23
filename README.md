@@ -4,6 +4,8 @@
 A powerful file conversion tool built with React and TypeScript that supports multiple file formats and provides high-quality conversions.
 
 
+I created this project, Convertopia Manager, to explore client-side file conversion and enhance my skills in Python for web development. Through this project, I aimed to learn how to handle file conversions without relying on a server, while also gaining practical experience with Python and web technologies.
+
 [LIVE DEMO](https://adelelawady.github.io/convertopia-manager/)
 
 # 🔄 SCREEN SHOTS
