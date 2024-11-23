@@ -1,14 +1,25 @@
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 
+const basename = import.meta.env.DEV ? '' : '/convertopia-manager';
+
+interface ConverterCard {
+  title: string;
+  description: string;
+  path: string;
+  icon: string;
+  formats: string[];
+  features: string[];
+}
+
 const ImageConverter = () => {
-  const converters = [
+  const converters: ConverterCard[] = [
     {
       title: "PNG Converter",
-      description: "Convert PNG images to JPEG, WebP, or GIF formats",
+      description: "Convert PNG images to other formats",
       path: "/image-converter/png",
-      icon: "/icons/png-icon.svg",
-      formats: ["JPEG", "WebP", "GIF"],
+      icon: `${basename}/icons/png-icon.svg`,
+      formats: ["JPEG", "WebP", "GIF", "ICO", "BMP"],
       features: [
         "Lossless compression",
         "Transparency support",
@@ -17,21 +28,21 @@ const ImageConverter = () => {
     },
     {
       title: "JPEG Converter",
-      description: "Convert JPEG images to PNG, WebP, or GIF formats",
+      description: "Convert JPEG images to other formats",
       path: "/image-converter/jpeg",
-      icon: "/icons/jpg-icon.svg",
-      formats: ["PNG", "WebP", "GIF","Ico","Bmp"],
+      icon: `${basename}/icons/jpg-icon.svg`,
+      formats: ["PNG", "WebP", "GIF", "ICO", "BMP"],
       features: [
         "Optimized compression",
         "Fast conversion",
-        "Wide compatibility"
+        "Batch processing"
       ]
     },
     {
       title: "WebP Converter",
       description: "Convert WebP images to PNG, JPEG, or GIF formats",
       path: "/image-converter/webp",
-      icon: "/icons/webp-icon.svg",
+      icon: `${basename}/icons/webp-icon.svg`,
       formats: ["PNG", "JPEG", "GIF","Ico","Bmp"],
       features: [
         "Modern format",
@@ -43,7 +54,7 @@ const ImageConverter = () => {
       title: "GIF Converter",
       description: "Convert GIF images to PNG, JPEG, or WebP formats",
       path: "/image-converter/gif",
-      icon: "/icons/gif-icon.svg",
+      icon: `${basename}/icons/gif-icon.svg`,
       formats: ["PNG", "JPEG", "WebP","ico","Bmp"],
       features: [
         "Animation support",
@@ -56,7 +67,7 @@ const ImageConverter = () => {
       title: "Ico Converter",
       description: "Convert Ico images to PNG, JPEG, or WebP formats",
       path: "/image-converter/ico",
-      icon: "/icons/ico-icon.svg",
+      icon: `${basename}/icons/ico-icon.svg`,
       formats: ["PNG", "JPEG", "WebP","gif","Bmp"],
       features: [
         "Animation support",
@@ -69,7 +80,7 @@ const ImageConverter = () => {
       title: "Bmp Converter",
       description: "Convert Bmp images to PNG, JPEG, or WebP formats",
       path: "/image-converter/bmp",
-      icon: "/icons/bmp-icon.svg",
+      icon: `${basename}/icons/bmp-icon.svg`,
       formats: ["PNG", "JPEG", "WebP","gif","ico"],
       features: [
         "Animation support",

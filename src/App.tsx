@@ -35,13 +35,15 @@ import IcoConverter from "./pages/image-converters/IcoConverter";
 import BmpConverter from "./pages/image-converters/BmpConverter";
 
 const queryClient = new QueryClient();
+const basename = import.meta.env.DEV ? '' : '/convertopia-manager';
 
 const App = () => (
+  
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
+      <BrowserRouter basename={basename}>
         <PyodideProvider>
           <div className="min-h-screen flex flex-col">
             <Navbar />

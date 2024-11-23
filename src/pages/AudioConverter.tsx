@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import { Music } from "lucide-react";
 
+const basename = import.meta.env.DEV ? '' : '/convertopia-manager';
+
 interface ConverterCard {
   title: string;
   description: string;
@@ -16,7 +18,7 @@ const AudioConverter = () => {
       title: "MP3 Converter",
       description: "Convert MP3 files to other audio formats",
       path: "/audio-converter/mp3",
-      icon: "/icons/mp3-icon.svg",
+      icon: `${basename}/icons/mp3-icon.svg`,
       formats: ["WAV", "OGG", "M4A", "FLAC"],
       features: [
         "High quality conversion",
@@ -28,7 +30,7 @@ const AudioConverter = () => {
       title: "WAV Converter",
       description: "Convert WAV files to compressed formats",
       path: "/audio-converter/wav",
-      icon: "/icons/wav-icon.svg",
+      icon: `${basename}/icons/wav-icon.svg`,
       formats: ["MP3", "OGG", "M4A", "FLAC"],
       features: [
         "Lossless conversion",
@@ -40,7 +42,7 @@ const AudioConverter = () => {
       title: "OGG Converter",
       description: "Convert OGG files to other formats",
       path: "/audio-converter/ogg",
-      icon: "/icons/ogg-icon.svg",
+      icon: `${basename}/icons/ogg-icon.svg`,
       formats: ["MP3", "WAV", "M4A", "FLAC"],
       features: [
         "Open source format",
@@ -52,7 +54,7 @@ const AudioConverter = () => {
       title: "M4A Converter",
       description: "Convert M4A files to other formats",
       path: "/audio-converter/m4a",
-      icon: "/icons/m4a-icon.svg",
+      icon: `${basename}/icons/m4a-icon.svg`,
       formats: ["MP3", "WAV", "OGG", "FLAC"],
       features: [
         "AAC audio support",
@@ -64,7 +66,7 @@ const AudioConverter = () => {
       title: "FLAC Converter",
       description: "Convert FLAC files while preserving quality",
       path: "/audio-converter/flac",
-      icon: "/icons/flac-icon.svg",
+      icon: `${basename}/icons/flac-icon.svg`,
       formats: ["MP3", "WAV", "OGG", "M4A"],
       features: [
         "Lossless compression",
