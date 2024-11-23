@@ -1,4 +1,3 @@
-
 # 🔄 Convertopia Manager
 
 A powerful file conversion tool built with React and TypeScript that supports multiple file formats and provides high-quality conversions.
@@ -58,7 +57,6 @@ npm start
 
 - ⚛️ React 18
 - 📘 TypeScript
-- 🎨 Tailwind CSS
 - 🎨 Tabler
 - 🔧 Vite
 - 🎬 FFmpeg.wasm
@@ -95,35 +93,122 @@ npm start
    - Efficient memory usage
    - WebAssembly optimization
 
-## 📱 Browser Support
+# 🔄 Available Conversions
 
-- Chrome (recommended)
-- Firefox
-- Safari
-- Edge
+## 🖼️ Image Conversions
 
-## 🔄 Recent Updates
+### PNG Converter
+- PNG to JPEG
+- PNG to WebP
+- PNG to GIF
+- PNG to ICO
+- PNG to BMP
 
-### Version 1.0.0
-- Initial release
-- Image conversion support
-- Basic audio conversion
-- Responsive UI implementation
+### JPEG Converter
+- JPEG to PNG
+- JPEG to WebP
+- JPEG to GIF
+- JPEG to ICO
+- JPEG to BMP
 
-### Version 1.1.0
-- Added new format support
-- Improved conversion quality
-- Enhanced error handling
-- Performance optimizations
+### WebP Converter
+- WebP to PNG
+- WebP to JPEG
+- WebP to GIF
+- WebP to ICO
+- WebP to BMP
 
-## 🗺️ Roadmap
+### GIF Converter
+- GIF to PNG
+- GIF to JPEG
+- GIF to WebP
+- GIF to ICO
+- GIF to BMP
 
-- [ ] Document conversion implementation
-- [ ] Batch processing improvements
-- [ ] Additional format support
-- [ ] Custom conversion settings
-- [ ] Progressive Web App support
+### ICO Converter
+- ICO to PNG
+- ICO to JPEG
+- ICO to WebP
+- ICO to GIF
+- ICO to BMP
 
+### BMP Converter
+- BMP to PNG
+- BMP to JPEG
+- BMP to WebP
+- BMP to GIF
+- BMP to ICO
+
+## 🎵 Audio Conversions
+
+### MP3 Converter
+- MP3 to WAV
+- MP3 to OGG
+- MP3 to M4A
+- MP3 to FLAC
+
+### WAV Converter
+- WAV to MP3
+- WAV to OGG
+- WAV to M4A
+- WAV to FLAC
+
+### OGG Converter
+- OGG to MP3
+- OGG to WAV
+- OGG to M4A
+- OGG to FLAC
+
+### M4A Converter
+- M4A to MP3
+- M4A to WAV
+- M4A to OGG
+- M4A to FLAC
+
+### FLAC Converter
+- FLAC to MP3
+- FLAC to WAV
+- FLAC to OGG
+- FLAC to M4A
+
+
+## 🔍 Features by Format
+
+### Image Formats
+- **PNG**: Lossless compression, transparency support
+- **JPEG**: Optimized for photographs, adjustable quality
+- **WebP**: Modern format with excellent compression
+- **GIF**: Animation support, palette optimization
+- **ICO**: Multi-size favicon support
+- **BMP**: Basic bitmap format, uncompressed
+
+### Audio Formats
+- **MP3**: Universal compatibility, adjustable bitrate
+- **WAV**: Lossless quality, professional standard
+- **OGG**: Open source, efficient compression
+- **M4A**: AAC encoding, good quality-to-size ratio
+- **FLAC**: Lossless compression, perfect quality
+
+### Document Formats (Coming Soon)
+- **PDF**: Universal document format
+- **DOC/DOCX**: Microsoft Word formats
+- **TXT**: Plain text, universal compatibility
+- **RTF**: Rich text format with basic formatting
+
+## NOTE
+'''
+The file sizes may be larger or smaller than usual. You can update the arguments in FFmpeg to enhance the output quality or adjust the size.
+'''
+## 💫 Conversion Features
+
+- ✨ Batch processing support
+- 🔒 Client-side conversion (no uploads)
+- 📊 Progress tracking
+- 🎨 Format-specific optimizations
+- 🔄 Drag and drop support
+- 📱 Mobile-friendly interface
+- 🏃 Fast processing
+- 💾 Automatic download
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
