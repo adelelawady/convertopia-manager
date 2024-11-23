@@ -1,49 +1,59 @@
-// Add Cross-Origin-Embedder-Policy: require-corp
-const addCOEPHeader = async (request) => {
-  const response = await fetch(request);
-  const newHeaders = new Headers(response.headers);
-  newHeaders.set("Cross-Origin-Embedder-Policy", "require-corp");
-  
-  return new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers: newHeaders,
-  });
-};
-
-// Add Cross-Origin-Opener-Policy: same-origin
-const addCOOPHeader = async (request) => {
-  const response = await fetch(request);
-  const newHeaders = new Headers(response.headers);
-  newHeaders.set("Cross-Origin-Opener-Policy", "same-origin");
-  
-  return new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers: newHeaders,
-  });
-};
-
-// Handle fetch events
-self.addEventListener("fetch", (event) => {
-  const url = new URL(event.request.url);
-  
-  // Skip if request is not from our origin
-  if (url.origin !== location.origin) {
-    return;
-  }
-
-  event.respondWith(
-    (async () => {
-      // Add both headers
-      const responseWithCOEP = await addCOEPHeader(event.request);
-      const responseWithBothHeaders = await addCOOPHeader(
-        new Request(event.request.url, {
-          headers: responseWithCOEP.headers,
-        })
+// Add required headers to all responses
+self.addEventListener('fetch', (event) => {
+    const url = new URL(event.request.url);
+    
+    // Handle FFmpeg worker requests
+    if (url.href.includes('@ffmpeg/')) {
+      event.respondWith(
+        fetch(event.request)
+          .then(response => {
+            const newHeaders = new Headers(response.headers);
+            newHeaders.set('Cross-Origin-Resource-Policy', 'cross-origin');
+            newHeaders.set('Access-Control-Allow-Origin', '*');
+            
+            return new Response(response.body, {
+              status: response.status,
+              statusText: response.statusText,
+              headers: newHeaders,
+            });
+          })
       );
-      
-      return responseWithBothHeaders;
-    })()
-  );
-}); 
+      return;
+    }
+  
+    if (event.request.mode === 'navigate') {
+      event.respondWith(
+        fetch(event.request)
+          .then(response => {
+            const newHeaders = new Headers(response.headers);
+            newHeaders.set('Cross-Origin-Embedder-Policy', 'require-corp');
+            newHeaders.set('Cross-Origin-Opener-Policy', 'same-origin');
+            newHeaders.set('Cross-Origin-Resource-Policy', 'cross-origin');
+            newHeaders.set('Access-Control-Allow-Origin', '*');
+  
+            return new Response(response.body, {
+              status: response.status,
+              statusText: response.statusText,
+              headers: newHeaders,
+            });
+          })
+      );
+    } else {
+      event.respondWith(
+        fetch(event.request)
+          .then(response => {
+            const newHeaders = new Headers(response.headers);
+            newHeaders.set('Cross-Origin-Resource-Policy', 'cross-origin');
+            newHeaders.set('Access-Control-Allow-Origin', '*');
+            
+            return new Response(response.body, {
+              status: response.status,
+              statusText: response.statusText,
+              headers: newHeaders,
+            });
+          })
+      );
+    }
+  });
+  
+  // ... rest of the service worker code remains the same ...
