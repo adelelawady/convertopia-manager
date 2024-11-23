@@ -1,25 +1,17 @@
 import { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import FileUploader from "@/components/FileUploader";
 import { handleConversion } from "@/utils/conversionHandler";
 
-const outputFormats = [
-  { value: "doc", label: "DOC" },
-  { value: "docx", label: "DOCX" },
-  { value: "txt", label: "TXT" },
-  { value: "rtf", label: "RTF" },
-];
-
 const PdfConverter = () => {
-  const [selectedFormat, setSelectedFormat] = useState(outputFormats[0].value);
+  const [selectedFormat, setSelectedFormat] = useState('doc');
 
   const handleConvert = async (files: File[]) => {
-    await handleConversion({
+    return await handleConversion({
       files,
-      outputFormat: selectedFormat.toUpperCase(),
-      inputFormat: "PDF"
+      outputFormat: selectedFormat,
+      inputFormat: 'PDF'
     });
   };
 
@@ -35,7 +27,7 @@ const PdfConverter = () => {
       
       <h1 className="text-3xl font-bold text-gray-900 mb-4">PDF Converter</h1>
       <p className="text-gray-600 mb-8">
-        Convert your PDF files to other formats
+        Convert your PDF documents to other formats while preserving layout and formatting
       </p>
 
       <div className="bg-white rounded-lg shadow p-6 space-y-6">
@@ -43,18 +35,16 @@ const PdfConverter = () => {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Output Format
           </label>
-          <Select value={selectedFormat} onValueChange={setSelectedFormat}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select format" />
-            </SelectTrigger>
-            <SelectContent>
-              {outputFormats.map((format) => (
-                <SelectItem key={format.value} value={format.value}>
-                  {format.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <select 
+            value={selectedFormat}
+            onChange={(e) => setSelectedFormat(e.target.value)}
+            className="p-2 border rounded w-[180px]"
+          >
+            <option value="doc">DOC</option>
+            <option value="docx">DOCX</option>
+            <option value="txt">TXT</option>
+            <option value="rtf">RTF</option>
+          </select>
         </div>
 
         <div>
@@ -63,8 +53,22 @@ const PdfConverter = () => {
           </label>
           <FileUploader
             acceptedFileTypes={[".pdf"]}
+            maxFiles={10}
             onConvert={handleConvert}
+            outputFormat={selectedFormat}
           />
+        </div>
+
+        <div className="text-sm text-gray-500 mt-4">
+          <h3 className="font-medium text-gray-700 mb-2">About PDF Conversion</h3>
+          <ul className="list-disc pl-5 space-y-1">
+            <li>PDF to DOC/DOCX: Converts while maintaining formatting and images</li>
+            <li>PDF to TXT: Extracts plain text content</li>
+            <li>PDF to RTF: Preserves basic formatting and structure</li>
+          </ul>
+          <p className="mt-2 text-yellow-600">
+            Note: Complex PDF layouts may not convert perfectly in all cases
+          </p>
         </div>
       </div>
     </div>

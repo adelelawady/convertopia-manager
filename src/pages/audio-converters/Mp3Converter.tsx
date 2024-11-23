@@ -1,28 +1,20 @@
-import { useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { useState } from 'react';
+import { handleConversion } from '@/utils/conversionHandler';
+import { FileUploader } from '@/components/FileUploader';
+import { ArrowLeft } from 'lucide-react';
 import { Link } from "react-router-dom";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import FileUploader from "@/components/FileUploader";
-import { toast } from "sonner";
-import { handleConversion } from "@/utils/conversionHandler";
-
-const outputFormats = [
-  { value: "wav", label: "WAV" },
-  { value: "ogg", label: "OGG" },
-  { value: "m4a", label: "M4A" },
-  { value: "flac", label: "FLAC" },
-];
 
 const Mp3Converter = () => {
-  const [selectedFormat, setSelectedFormat] = useState(outputFormats[0].value);
+  const [selectedFormat, setSelectedFormat] = useState('wav');
 
   const handleConvert = async (files: File[]) => {
-    await handleConversion({
+    return await handleConversion({
       files,
-      outputFormat: selectedFormat.toUpperCase(),
-      inputFormat: "MP3"
+      outputFormat: selectedFormat,
+      inputFormat: 'MP3'
     });
-  }
+  };
+
   return (
     <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
       <Link 
@@ -35,7 +27,7 @@ const Mp3Converter = () => {
       
       <h1 className="text-3xl font-bold text-gray-900 mb-4">MP3 Converter</h1>
       <p className="text-gray-600 mb-8">
-        Convert your MP3 files to other formats
+        Convert your MP3 files to other audio formats
       </p>
 
       <div className="bg-white rounded-lg shadow p-6 space-y-6">
@@ -43,18 +35,16 @@ const Mp3Converter = () => {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Output Format
           </label>
-          <Select value={selectedFormat} onValueChange={setSelectedFormat}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select format" />
-            </SelectTrigger>
-            <SelectContent>
-              {outputFormats.map((format) => (
-                <SelectItem key={format.value} value={format.value}>
-                  {format.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <select 
+            value={selectedFormat}
+            onChange={(e) => setSelectedFormat(e.target.value)}
+            className="p-2 border rounded w-[180px]"
+          >
+            <option value="wav">WAV</option>
+            <option value="ogg">OGG</option>
+            <option value="m4a">M4A</option>
+            <option value="flac">FLAC</option>
+          </select>
         </div>
 
         <div>
@@ -63,8 +53,23 @@ const Mp3Converter = () => {
           </label>
           <FileUploader
             acceptedFileTypes={[".mp3"]}
+            maxFiles={10}
             onConvert={handleConvert}
+            outputFormat={selectedFormat}
           />
+        </div>
+
+        <div className="text-sm text-gray-500 mt-4">
+          <h3 className="font-medium text-gray-700 mb-2">About MP3 Conversion</h3>
+          <ul className="list-disc pl-5 space-y-1">
+            <li>MP3 to WAV: Uncompressed audio for highest quality</li>
+            <li>MP3 to OGG: Open format with good compression</li>
+            <li>MP3 to M4A: Modern format with AAC compression</li>
+            <li>MP3 to FLAC: Lossless compression for audiophiles</li>
+          </ul>
+          <p className="mt-2 text-yellow-600">
+            Note: Converting from MP3 to other formats cannot improve audio quality
+          </p>
         </div>
       </div>
     </div>

@@ -19,7 +19,7 @@ export const PyodideProvider = ({ children }: PyodideLoaderProps) => {
         });
 
         // Load required Python packages
-        await pyodide.loadPackage(['numpy', 'pillow', 'micropip']);
+        await pyodide.loadPackage(['numpy', 'pillow', 'micropip','pandas']);
 
         // Initialize the Python environment with required functions
         await pyodide.runPythonAsync(`

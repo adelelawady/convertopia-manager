@@ -1,4 +1,20 @@
+import mammoth from 'mammoth';
+import { jsPDF } from 'jspdf';
 import { toast } from "sonner";
+import * as pdfjsLib from 'pdfjs-dist';
+import { getDocument } from 'pdfjs-dist';
+const pdfjsWorker = new URL('pdfjs-dist/build/pdf.worker.js', import.meta.url);
+
+import {Buffer} from 'Buffer';
+import { FFmpeg } from '@ffmpeg/ffmpeg';
+import { fetchFile, toBlobURL } from '@ffmpeg/util';
+import { useState, useRef } from "react";
+
+// Initialize PDF.js worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.mjs',
+  import.meta.url
+).toString();
 
 interface ConversionRequest {
   files: File[];
@@ -12,6 +28,7 @@ export interface ConvertedFile {
   originalName: string;
   outputFormat: string;
 }
+
 
 const handleImageConversion = async (files: File[], outputFormat: string): Promise<ConvertedFile[]> => {
   try {
@@ -186,14 +203,14 @@ export const handleConversion = async ({ files, outputFormat, inputFormat }: Con
       case 'docx':
       case 'txt':
       case 'rtf':
-        await handleDocumentConversion(files, outputFormat);
+        convertedFiles = await handleDocumentConversion(files, outputFormat);
         break;
       case 'mp3':
       case 'wav':
       case 'ogg':
       case 'm4a':
       case 'flac':
-        await handleAudioConversion(files, outputFormat);
+        convertedFiles = await handleAudioConversion(files, outputFormat);
         break;
       default:
         throw new Error(`Unsupported input format: ${inputFormat}`);
@@ -216,14 +233,208 @@ export const handleConversion = async ({ files, outputFormat, inputFormat }: Con
 };
 
 // Simulated conversion handlers for different file types
-const handleDocumentConversion = async (files: File[], outputFormat: string) => {
-  // Simulate processing time
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  console.log(`Processing ${files.length} document files to ${outputFormat}`);
+const handleDocumentConversion = async (files: File[], outputFormat: string): Promise<ConvertedFile[]> => {
+  try {
+    const results = await Promise.all(files.map(async (file) => {
+      const arrayBuffer = await file.arrayBuffer();
+      let convertedData: ArrayBuffer;
+      
+      if (file.name.toLowerCase().endsWith('.pdf') && outputFormat.toLowerCase() === 'doc') {
+        // Load PDF document using PDF.js
+        const loadingTask = pdfjsLib.getDocument(new Uint8Array(arrayBuffer));
+        const pdfDoc = await loadingTask.promise;
+        let textContent = '';
+
+        // Extract text from all pages
+        for (let i = 1; i <= pdfDoc.numPages; i++) {
+          const page = await pdfDoc.getPage(i);
+          const content = await page.getTextContent();
+          const pageText = content.items
+            .map((item: any) => item.str)
+            .join(' ');
+          textContent += pageText + '\n\n';
+        }
+
+        // Create RTF content (simpler format that works better for basic text)
+        const rtfContent = `{\\rtf1\\ansi\\deff0
+          {\\fonttbl{\\f0\\froman Times New Roman;}}
+          \\viewkind4\\uc1\\pard\\f0\\fs24
+          ${textContent.split('\n').map(line => 
+            line.trim() ? `${line}\\par` : ''
+          ).join('\n')}
+        }`;
+
+        // Convert the RTF content to ArrayBuffer
+        const encoder = new TextEncoder();
+        convertedData = encoder.encode(rtfContent).buffer;
+
+      } else if (file.name.toLowerCase().endsWith('.doc') && outputFormat.toLowerCase() === 'pdf') {
+        // Create PDF directly from text content
+        const decoder = new TextDecoder();
+        const text = decoder.decode(arrayBuffer);
+
+        // Create PDF
+        const pdf = new jsPDF();
+        const splitText = pdf.splitTextToSize(text, 180); // Split text to fit page width
+        
+        let y = 20; // Starting y position
+        
+        for (const line of splitText) {
+          if (y > 280) { // Check if we need a new page
+            pdf.addPage();
+            y = 20;
+          }
+          
+          pdf.text(line, 15, y);
+          y += 7; // Line spacing
+        }
+
+        convertedData = pdf.output('arraybuffer');
+      } else {
+        throw new Error(`Unsupported conversion: ${file.name} to ${outputFormat}`);
+      }
+
+      // Create new file with converted data
+      const newFileName = `${file.name.split('.')[0]}.${outputFormat.toLowerCase()}`;
+      const mimeTypes = {
+        'doc': 'application/msword',
+        'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'pdf': 'application/pdf',
+        'txt': 'text/plain',
+        'rtf': 'application/rtf'
+      };
+
+      const newFile = new File([convertedData], newFileName, {
+        type: mimeTypes[outputFormat.toLowerCase()]
+      });
+
+      const url = URL.createObjectURL(newFile);
+
+      return {
+        file: newFile,
+        url,
+        originalName: file.name,
+        outputFormat: outputFormat.toLowerCase()
+      };
+    }));
+
+    toast.success(`Successfully converted ${files.length} files to ${outputFormat}`);
+    return results;
+  } catch (error) {
+    console.error('Document conversion error:', error);
+    toast.error(`Failed to convert documents: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw error;
+  }
 };
 
-const handleAudioConversion = async (files: File[], outputFormat: string) => {
-  // Simulate processing time
-  await new Promise(resolve => setTimeout(resolve, 2000));
-  console.log(`Processing ${files.length} audio files to ${outputFormat}`);
+// Create a singleton FFmpeg instance
+const ffmpeg = new FFmpeg();
+let loaded = false;
+
+const loadFFmpeg = async () => {
+  if (loaded) return;
+
+  const baseURL = 'https://unpkg.com/@ffmpeg/core-mt@0.12.6/dist/esm';
+  
+  ffmpeg.on('log', ({ message }) => {
+    console.log(message);
+  });
+
+  await ffmpeg.load({
+    coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+    wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+    workerURL: await toBlobURL(`${baseURL}/ffmpeg-core.worker.js`, 'text/javascript'),
+  });
+
+  loaded = true;
+};
+
+const handleAudioConversion = async (files: File[], outputFormat: string): Promise<ConvertedFile[]> => {
+  try {
+    await loadFFmpeg();
+
+    const results = await Promise.all(files.map(async (file) => {
+      const inputFileName = `input-${Date.now()}.${file.name.split('.').pop()}`;
+      const outputFileName = `output-${Date.now()}.${outputFormat.toLowerCase()}`;
+
+      try {
+        // Write input file
+        await ffmpeg.writeFile(inputFileName, await fetchFile(file));
+
+        // Set conversion arguments based on format
+        const ffmpegArgs = ['-i', inputFileName];
+        
+        switch (outputFormat.toLowerCase()) {
+          case 'mp3':
+            ffmpegArgs.push('-c:a', 'libmp3lame', '-q:a', '2');
+            break;
+          case 'ogg':
+            ffmpegArgs.push('-c:a', 'libvorbis', '-q:a', '4');
+            break;
+          case 'm4a':
+            ffmpegArgs.push('-c:a', 'aac', '-b:a', '192k');
+            break;
+          case 'flac':
+            ffmpegArgs.push('-c:a', 'flac');
+            break;
+          case 'wav':
+            ffmpegArgs.push('-c:a', 'pcm_s16le');
+            break;
+          default:
+            throw new Error(`Unsupported output format: ${outputFormat}`);
+        }
+        
+        ffmpegArgs.push(outputFileName);
+
+        // Run conversion
+        await ffmpeg.exec(ffmpegArgs);
+
+        // Read output file
+        const data = await ffmpeg.readFile(outputFileName);
+        
+        if (!(data instanceof Uint8Array)) {
+          throw new Error('Converted file data is not in the expected format');
+        }
+
+        // Create output file
+        const newFileName = `${file.name.split('.')[0]}.${outputFormat.toLowerCase()}`;
+        const mimeTypes = {
+          'wav': 'audio/wav',
+          'ogg': 'audio/ogg',
+          'm4a': 'audio/mp4',
+          'flac': 'audio/flac',
+          'mp3': 'audio/mpeg'
+        };
+
+        const newFile = new File([data], newFileName, {
+          type: mimeTypes[outputFormat.toLowerCase()] || `audio/${outputFormat.toLowerCase()}`
+        });
+
+        // Cleanup
+        await ffmpeg.deleteFile(inputFileName);
+        await ffmpeg.deleteFile(outputFileName);
+
+        const url = URL.createObjectURL(newFile);
+
+        return {
+          file: newFile,
+          url,
+          originalName: file.name,
+          outputFormat: outputFormat.toLowerCase()
+        };
+
+      } catch (error) {
+        console.error('Error converting file:', file.name, error);
+        throw error;
+      }
+    }));
+
+    toast.success(`Successfully converted ${files.length} files to ${outputFormat}`);
+    return results;
+
+  } catch (error) {
+    console.error('Audio conversion error:', error);
+    toast.error(`Failed to convert audio: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw error;
+  }
 }; 
