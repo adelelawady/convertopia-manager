@@ -386,8 +386,7 @@ const handleAudioConversion = async (files: File[], outputFormat: string): Promi
               '-q:a', '0',  // Highest quality for MP3 (0-9, lower is better)
               '-joint_stereo', '1',  // Use joint stereo
               '-b:a', '320k',  // Maximum bitrate
-              '-ar', '48000',  // High sample rate
-              '-af', 'aresample=resampler=soxr:precision=28:dither_method=triangular'  // High quality resampling
+              '-ar', '48000'  // High sample rate
             );
             break;
           case 'ogg':
@@ -395,8 +394,7 @@ const handleAudioConversion = async (files: File[], outputFormat: string): Promi
               '-c:a', 'libvorbis',
               '-q:a', '10',  // Highest quality setting (0-10)
               '-compression_level', '10',  // Maximum compression
-              '-ar', '48000',  // High sample rate
-              '-af', 'aresample=resampler=soxr:precision=28'  // High quality resampling
+              '-ar', '48000'  // High sample rate
             );
             break;
           case 'm4a':
@@ -406,7 +404,6 @@ const handleAudioConversion = async (files: File[], outputFormat: string): Promi
               '-profile:a', 'aac_low',  // AAC profile
               '-movflags', '+faststart',  // Optimize for streaming
               '-ar', '48000',  // High sample rate
-              '-af', 'aresample=resampler=soxr:precision=28',  // High quality resampling
               '-strict', 'experimental'  // Allow experimental codecs
             );
             break;
@@ -415,15 +412,13 @@ const handleAudioConversion = async (files: File[], outputFormat: string): Promi
               '-c:a', 'flac',
               '-compression_level', '12',  // Maximum compression
               '-sample_fmt', 's32',  // 32-bit sample format
-              '-ar', '96000',  // Highest sample rate
-              '-af', 'aresample=resampler=soxr:precision=33'  // Ultra-high quality resampling
+              '-ar', '96000'  // Highest sample rate
             );
             break;
           case 'wav':
             ffmpegArgs.push(
               '-c:a', 'pcm_s24le',  // 24-bit PCM
               '-ar', '96000',  // High sample rate
-              '-af', 'aresample=resampler=soxr:precision=28',  // High quality resampling
               '-bitexact'  // Ensure exact audio reproduction
             );
             break;
