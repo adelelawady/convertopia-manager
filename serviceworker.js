@@ -3,7 +3,7 @@ self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
     
     // Handle FFmpeg worker requests
-     if (url.href.includes('@ffmpeg/') || url.href.includes('ffmpeg-core')) {
+     if (url.href.includes('@ffmpeg/') || url.href.includes('ffmpeg-core')  || url.href.includes('assets') ) {
     event.respondWith(
       fetch(event.request)
         .then(response => {
